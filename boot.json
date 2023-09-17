@@ -1,0 +1,25 @@
+{
+  "name": "ModLoaderGui",
+  "version": "1.0.0",
+  "styleFileList": [
+  ],
+  "scriptFileList_earlyload": [
+    "dist/earlyload/earlyload.js"
+  ],
+  "scriptFileList_inject_early": [
+    "node_modules/jszip/dist/jszip.js"
+  ],
+  "scriptFileList_preload": [
+  ],
+  "scriptFileList": [
+  ],
+  "tweeFileList": [
+  ],
+  "imgFileList": [
+  ],
+  "imgFileReplaceList": [
+  ],
+  "addstionFile": [
+    "README.md"
+  ]
+}
