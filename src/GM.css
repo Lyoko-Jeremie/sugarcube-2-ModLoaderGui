@@ -1,0 +1,59 @@
+
+html, body, #MyConfig {
+    /*background-color: #262626;*/
+    background-color: rgb(128, 128, 128);
+}
+
+/** {*/
+/*    color: whitesmoke;*/
+/*}*/
+
+/*#MyConfig_resetLink {*/
+/*    color: whitesmoke !important;*/
+/*}*/
+
+/*input[type="button"], button {*/
+/*    background-color: #262626;*/
+/*}*/
+
+#MyConfig {
+    margin: 1em;
+}
+
+#MyConfig textarea {
+    font-family: "Consolas", monospace !important;
+}
+
+#MyConfig input[type="text"] {
+    background-color: lightgrey;
+}
+
+#MyConfig textarea:focus {
+    font-family: "Consolas", monospace !important;
+    width: 80%;
+    min-height: 20em;
+}
+
+#MyConfig_install_EnchantedRestraintsPatch_var {
+    /*display: inline-block;*/
+}
+
+#MyConfig_Name_var {
+    /*display: inline-block;*/
+}
+
+.d-inline {
+    display: inline-block !important;
+}
+
+#startBanner {
+    position: fixed;
+    right: 1px;
+    bottom: 1px;
+    font-size: 1em;
+    z-index: 1001;
+    user-select: none;
+    border: rgb(128, 128, 128) dashed 2px;
+    color: rgb(128, 128, 128);
+    padding: .25em;
+}

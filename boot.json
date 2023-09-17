@@ -7,7 +7,7 @@
     "dist/earlyload/earlyload.js"
   ],
   "scriptFileList_inject_early": [
-    "node_modules/jszip/dist/jszip.js"
+    "dist/ModLoaderGui.js"
   ],
   "scriptFileList_preload": [
   ],
