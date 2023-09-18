@@ -10,6 +10,22 @@ import {isString, isSafeInteger, isNil} from "lodash";
 
 const btnType: BootstrapBtnType = 'secondary';
 
+const StringTable = {
+    title: 'Mod管理器',
+    close: '关闭',
+    NowLoadedModeList: '当前已加载的Mod列表：',
+    NowSideLoadModeList: '当前设定的旁加载Mod列表：（下次刷新页面后生效）',
+    SelectModZipFile: '选择要添加的旁加载Mod的Zip文件：',
+    AddMod: '添加旁加载Mod',
+    AddModResult: '添加旁加载Mod的结果：',
+    CanRemoveModList: '可移除的旁加载Mod列表：',
+    RemoveMod: '移除选定的旁加载Mod',
+
+    SectionMod: 'Mod管理',
+    SectionAddRemove: '添加/移除Mod',
+};
+
+
 export class Gui {
     // avoid same Math.random
     static rIdP = 0;
@@ -29,10 +45,10 @@ export class Gui {
     gui?: GM_configStruct;
 
     createGui() {
-        const NowLoadedModeList = this.gModUtils.getModListName().join('\n');
+        const NowLoadedModeList = this.getModListString().join('\n');
         const NowSideLoadModeList = this.gModUtils.getModLoadController().listModLocalStorage().join('\n');
-        console.log('NowLoadedModeList', NowLoadedModeList);
-        console.log('NowSideLoadModeList', NowSideLoadModeList);
+        // console.log('NowLoadedModeList', NowLoadedModeList);
+        // console.log('NowSideLoadModeList', NowSideLoadModeList);
         this.gui = new GM_config({
             xgmExtendInfo: {
                 xgmExtendMode: 'bootstrap',
@@ -46,11 +62,11 @@ export class Gui {
                 },
             },
             'id': 'MyConfig', // The id used for this instance of GM_config
-            'title': 'Degrees-of-Lewdity Cheats Mod', // Panel Title
+            'title': StringTable.title, // Panel Title
             css: inlineGMCss + '\n' + inlineBootstrap,
             'fields': {
                 'Close_b': {
-                    label: 'Close',
+                    label: StringTable.close,
                     type: 'button',
                     click: () => {
                         if (this.gui && this.gui.isOpen) {
@@ -62,32 +78,32 @@ export class Gui {
                     xgmExtendField: {bootstrap: {btnType: btnType}},
                 },
                 [this.rId()]: {
-                    section: GM_config.create('Mod Section'),
+                    section: GM_config.create(StringTable.SectionMod),
                     type: 'br',
                 },
                 'NowLoadedModeList_r': {
-                    label: 'NowLoadedModeList',
+                    label: StringTable.NowLoadedModeList,
                     type: 'textarea',
                     default: NowLoadedModeList,
                     readonly: "readonly",
                 },
                 'NowSideLoadModeList_r': {
-                    label: 'NowSideLoadModeList',
+                    label: StringTable.NowSideLoadModeList,
                     type: 'textarea',
                     default: NowSideLoadModeList,
                     readonly: "readonly",
                 },
                 [this.rId()]: {
-                    section: GM_config.create('ADD REMOVE Section'),
+                    section: GM_config.create(StringTable.SectionAddRemove),
                     type: 'br',
                 },
                 'AddMod_I': {
-                    label: 'SelectModZipFile',
+                    label: StringTable.SelectModZipFile,
                     type: 'file',
                     cssClassName: 'd-inline',
                 },
                 'AddMod_b': {
-                    label: 'AddMod',
+                    label: StringTable.AddMod,
                     type: 'button',
                     click: async () => {
                         this.gui!.fields['AddMod_R'].options = 'Loading...';
@@ -141,7 +157,7 @@ export class Gui {
                     xgmExtendField: {bootstrap: {btnType: btnType}},
                 },
                 'AddMod_R': {
-                    label: 'AddModResult',
+                    label: StringTable.AddModResult,
                     type: 'text',
                     value: '',
                     readonly: true,
@@ -150,7 +166,7 @@ export class Gui {
                     type: 'br',
                 },
                 'RemoveMod_s': {
-                    label: 'CanRemoveModList',
+                    label: StringTable.CanRemoveModList,
                     type: 'select',
                     labelPos: 'left',
                     options: this.gModUtils.getModLoadController().listModLocalStorage(),
@@ -158,7 +174,7 @@ export class Gui {
                     cssClassName: 'd-inline',
                 },
                 'RemoveMod_b': {
-                    label: 'RemoveMod',
+                    label: StringTable.RemoveMod,
                     type: 'button',
                     click: () => {
                         const doc = this.gui!.frame?.contentDocument;
@@ -230,6 +246,23 @@ export class Gui {
                 }
             }
         });
+        if (true) {
+            const startBanner = document.createElement('div');
+            startBanner.id = 'startBanner';
+            startBanner.innerText = StringTable.title;
+            startBanner.style.cssText = 'position: fixed;left: 1px;bottom: calc(1px + 1em);' +
+                'font-size: .75em;z-index: 1001;user-select: none;' +
+                'border: gray dashed 2px;color: gray;padding: .25em;';
+            startBanner.addEventListener('click', () => {
+                if (this.gui && this.gui.isOpen) {
+                    this.gui.close();
+                } else {
+                    this.createGui();
+                    this.gui && this.gui.open();
+                }
+            });
+            document.body.appendChild(startBanner);
+        }
     }
 
     async loadAndAddMod(htmlFile: HTMLInputElement) {
@@ -288,6 +321,33 @@ export class Gui {
             return s.replace(/^bootJsonFile (.+) Invalid$/, `bootJson文件 $1 无效`);
         }
         return s;
+    }
+
+    getModListString() {
+        const l = this.gModUtils.getModListName();
+        const ll = this.gSC2DataManager.getModLoader().getLocalLoader();
+        const rl = this.gSC2DataManager.getModLoader().getRemoteLoader();
+        const lsl = this.gSC2DataManager.getModLoader().getLocalStorageLoader();
+        const r: string[] = [];
+        for (const T of l) {
+            let f = false;
+            if (ll && ll.modZipList.has(T)) {
+                r.push(`[Local] ${T}`);
+                f = true;
+            }
+            if (rl && rl.modZipList.has(T)) {
+                r.push(`[Remote] ${T}`);
+                f = true;
+            }
+            if (lsl && lsl.modZipList.has(T)) {
+                r.push(`[SideLoad LocalStorage] ${T}`);
+                f = true;
+            }
+            if (!f) {
+                r.push(`[?] ${T}`);
+            }
+        }
+        return r;
     }
 
 }
