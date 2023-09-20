@@ -12,6 +12,7 @@
   "scriptFileList_preload": [
   ],
   "scriptFileList": [
+    "dist/preload/preload.js"
   ],
   "tweeFileList": [
   ],

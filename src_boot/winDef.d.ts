@@ -8,6 +8,7 @@ declare global {
         modSC2DataManager: SC2DataManager;
 
         modLoaderGui: Gui;
+        modLoaderGui_LoadingProgress: LoadingProgress;
 
         jQuery: jQuery;
     }

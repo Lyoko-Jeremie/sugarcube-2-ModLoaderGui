@@ -4,9 +4,9 @@ import inlineBootstrap from 'bootstrap/dist/css/bootstrap.css?inlineText';
 
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
-import type {ModLoadController, LifeTimeCircleHook} from "../../../dist-BeforeSC2/ModLoadController";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
 import {isString, isSafeInteger, isNil} from "lodash";
+import {LoadingProgress} from "./LoadingProgress";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -22,8 +22,11 @@ const StringTable = {
     CanRemoveModList: '可移除的旁加载Mod列表：',
     RemoveMod: '移除选定的旁加载Mod',
 
+    LoadLog: '加载日志',
+
     SectionMod: 'Mod管理',
     SectionAddRemove: '添加/移除Mod',
+    SectionLoadLog: 'Mod加载日志',
 };
 
 
@@ -39,6 +42,7 @@ export class Gui {
     constructor(
         public gSC2DataManager: SC2DataManager,
         public gModUtils: ModUtils,
+        public gLoadingProgress: LoadingProgress,
     ) {
         this.init();
     }
@@ -233,6 +237,16 @@ export class Gui {
                     // cssStyleText: 'display: inline-block;',
                     cssClassName: 'd-inline',
                     xgmExtendField: {bootstrap: {btnType: btnType}},
+                },
+                [this.rId()]: {
+                    section: GM_config.create(StringTable.SectionLoadLog),
+                    type: 'br',
+                },
+                'LoadLog_r': {
+                    label: StringTable.LoadLog,
+                    type: 'textarea',
+                    default: this.gLoadingProgress.getLoadLog().join('\n'),
+                    readonly: "readonly",
                 },
             },
             events: {
