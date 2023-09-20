@@ -13,6 +13,7 @@ const btnType: BootstrapBtnType = 'secondary';
 const StringTable = {
     title: 'Mod管理器',
     close: '关闭',
+    reload: '重新载入',
     NowLoadedModeList: '当前已加载的Mod列表：',
     NowSideLoadModeList: '当前设定的旁加载Mod列表：（下次刷新页面后生效）',
     SelectModZipFile: '选择要添加的旁加载Mod的Zip文件：',
@@ -44,11 +45,20 @@ export class Gui {
 
     gui?: GM_configStruct;
 
-    createGui() {
+    async listSideLoadMod() {
+        return await this.gModUtils.getModLoadController().listModIndexDB() || [];
+    }
+
+    async createGui() {
         const NowLoadedModeList = this.getModListString().join('\n');
-        const NowSideLoadModeList = this.gModUtils.getModLoadController().listModLocalStorage().join('\n');
-        // console.log('NowLoadedModeList', NowLoadedModeList);
-        // console.log('NowSideLoadModeList', NowSideLoadModeList);
+        const l = await this.listSideLoadMod();
+        const NowSideLoadModeList: string = l.join('\n');
+        console.log('NowLoadedModeList', NowLoadedModeList);
+        console.log('NowSideLoadModeList', NowSideLoadModeList);
+        if (this.gui && this.gui.isOpen) {
+            console.log('createGui() (this.gui && this.gui.isOpen)');
+            this.gui.close()
+        }
         this.gui = new GM_config({
             xgmExtendInfo: {
                 xgmExtendMode: 'bootstrap',
@@ -72,6 +82,16 @@ export class Gui {
                         if (this.gui && this.gui.isOpen) {
                             this.gui.close();
                         }
+                    },
+                    // cssStyleText: 'display: inline-block;',
+                    cssClassName: 'd-inline',
+                    xgmExtendField: {bootstrap: {btnType: btnType}},
+                },
+                'Reload_b': {
+                    label: StringTable.reload,
+                    type: 'button',
+                    click: () => {
+                        location.reload();
                     },
                     // cssStyleText: 'display: inline-block;',
                     cssClassName: 'd-inline',
@@ -125,11 +145,12 @@ export class Gui {
                             // this.gui!.fields['AddMod_R'].value = `Success. reload page to take effect`;
                             this.gui!.fields['AddMod_R'].value = `Success. 刷新页面后生效`;
                             this.gui!.fields['AddMod_R'].reload();
-                            console.log('this.gModUtils.getModLoadController().listModLocalStorage()', this.gModUtils.getModLoadController().listModLocalStorage());
-                            const MyConfig_field_NowSideLoadModeList_r = doc.getElementById('MyConfig_field_NowSideLoadModeList_r');
-                            if (MyConfig_field_NowSideLoadModeList_r) {
-                                (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = this.gModUtils.getModLoadController().listModLocalStorage().join('\n');
-                            }
+                            // console.log('this.gModUtils.getModLoadController().listModLocalStorage()', this.gModUtils.getModLoadController().listModLocalStorage());
+                            // const MyConfig_field_NowSideLoadModeList_r = doc.getElementById('MyConfig_field_NowSideLoadModeList_r');
+                            // if (MyConfig_field_NowSideLoadModeList_r) {
+                            //     (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value =
+                            //         this.gModUtils.getModLoadController().listModLocalStorage().join('\n');
+                            // }
                         } catch (E: any) {
                             const m = E?.message || E?.toString() || E;
                             console.error('AddMod_b', E);
@@ -137,19 +158,20 @@ export class Gui {
                             this.gui!.fields['AddMod_R'].value = `Error: ${this.errorMessage2CN(m)}`;
                             this.gui!.fields['AddMod_R'].reload();
                         }
+                        const l = await this.listSideLoadMod();
                         const MyConfig_field_RemoveMod_s = doc.getElementById('MyConfig_field_RemoveMod_s');
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
                             for (let a in select.options) {
                                 select.options.remove(0);
                             }
-                            for (const T of this.gModUtils.getModLoadController().listModLocalStorage()) {
+                            for (const T of l) {
                                 select.options.add(new Option(T, T));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.getElementById('MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
-                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = this.gModUtils.getModLoadController().listModLocalStorage().join('\n');
+                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = l.join('\n');
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -165,18 +187,18 @@ export class Gui {
                 [this.rId()]: {
                     type: 'br',
                 },
-                'RemoveMod_s': {
+                ['RemoveMod' + '_s']: {
                     label: StringTable.CanRemoveModList,
                     type: 'select',
                     labelPos: 'left',
-                    options: this.gModUtils.getModLoadController().listModLocalStorage(),
+                    options: l,
                     default: undefined,
                     cssClassName: 'd-inline',
                 },
-                'RemoveMod_b': {
+                ['RemoveMod' + '_b']: {
                     label: StringTable.RemoveMod,
                     type: 'button',
-                    click: () => {
+                    click: async () => {
                         const doc = this.gui!.frame?.contentDocument;
                         if (!doc) {
                             console.error('AddMod_b (!doc) : ', this.gui!.frame);
@@ -190,20 +212,22 @@ export class Gui {
                             ]);
                             return;
                         }
-                        this.gModUtils.getModLoadController().removeModLocalStorage(vv);
+                        this.gModUtils.getModLoadController().removeModIndexDB(vv);
                         const MyConfig_field_RemoveMod_s = doc.getElementById('MyConfig_field_RemoveMod_s');
+
+                        const l = await this.listSideLoadMod();
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
                             for (let a in select.options) {
                                 select.options.remove(0);
                             }
-                            for (const T of this.gModUtils.getModLoadController().listModLocalStorage()) {
+                            for (const T of l) {
                                 select.options.add(new Option(T, T));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.getElementById('MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
-                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = this.gModUtils.getModLoadController().listModLocalStorage().join('\n');
+                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = l.join('\n');
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -217,13 +241,13 @@ export class Gui {
                     // for (i in values) alert(values[i]);
                 },
                 open: (doc) => {
-                    doc.addEventListener('keydown', (event) => {
+                    doc.addEventListener('keydown', async (event) => {
                         // console.log('keydown', event);
                         if (event.altKey && (event.key === 'M' || event.key === 'm')) {
                             if (this.gui && this.gui.isOpen) {
                                 this.gui.close();
                             } else {
-                                this.createGui();
+                                await this.createGui();
                                 this.gui && this.gui.open();
                             }
                         }
@@ -233,15 +257,23 @@ export class Gui {
         });
     }
 
-    init() {
 
-        window.addEventListener('keydown', (event) => {
+    initOk = false;
+
+    init() {
+        if (this.initOk) {
+            console.error('init() (this.initOk)');
+            return;
+        }
+        this.initOk = true;
+
+        window.addEventListener('keydown', async (event) => {
             console.log('keydown', event);
             if (event.altKey && (event.key === 'M' || event.key === 'm')) {
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
                 } else {
-                    this.createGui();
+                    await this.createGui();
                     this.gui && this.gui.open();
                 }
             }
@@ -253,11 +285,11 @@ export class Gui {
             startBanner.style.cssText = 'position: fixed;left: 1px;bottom: calc(1px + 1em);' +
                 'font-size: .75em;z-index: 1001;user-select: none;' +
                 'border: gray dashed 2px;color: gray;padding: .25em;';
-            startBanner.addEventListener('click', () => {
+            startBanner.addEventListener('click', async () => {
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
                 } else {
-                    this.createGui();
+                    await this.createGui();
                     this.gui && this.gui.open();
                 }
             });
@@ -287,11 +319,20 @@ export class Gui {
             console.log('data', data);
             if (data && isString(data) && /^data:[^:;]+;base64,/.test(data)) {
                 const base64 = data.replace(/^data:[^:;]+;base64,/, '');
-                const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFile(base64);
+                const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFileIndexDB(base64);
                 if (isString(zipFile)) {
                     return `Error: ${zipFile}}`
                 } else {
-                    this.gModUtils.getModLoadController().addModLocalStorage(zipFile.name, base64);
+                    try {
+                        await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, base64);
+                    } catch (e) {
+                        console.error(e);
+                        try {
+                            this.gModUtils.getModLoadController().addModLocalStorage(zipFile.name, base64);
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    }
                 }
             }
             return `Success. reload page to take effect`;
@@ -328,6 +369,7 @@ export class Gui {
         const ll = this.gSC2DataManager.getModLoader().getLocalLoader();
         const rl = this.gSC2DataManager.getModLoader().getRemoteLoader();
         const lsl = this.gSC2DataManager.getModLoader().getLocalStorageLoader();
+        const idl = this.gSC2DataManager.getModLoader().getIndexDBLoader();
         const r: string[] = [];
         for (const T of l) {
             let f = false;
@@ -337,6 +379,10 @@ export class Gui {
             }
             if (rl && rl.modZipList.has(T)) {
                 r.push(`[Remote] ${T}`);
+                f = true;
+            }
+            if (idl && idl.modZipList.has(T)) {
+                r.push(`[SideLoad IndexDB] ${T}`);
                 f = true;
             }
             if (lsl && lsl.modZipList.has(T)) {
