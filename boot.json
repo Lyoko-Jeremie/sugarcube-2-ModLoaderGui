@@ -10,9 +10,9 @@
     "dist/ModLoaderGui.js"
   ],
   "scriptFileList_preload": [
+    "dist/preload/preload.js"
   ],
   "scriptFileList": [
-    "dist/preload/preload.js"
   ],
   "tweeFileList": [
   ],
