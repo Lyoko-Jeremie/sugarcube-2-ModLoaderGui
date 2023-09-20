@@ -216,7 +216,7 @@ export class Gui {
                             ]);
                             return;
                         }
-                        this.gModUtils.getModLoadController().removeModIndexDB(vv);
+                        await this.gModUtils.getModLoadController().removeModIndexDB(vv);
                         const MyConfig_field_RemoveMod_s = doc.getElementById('MyConfig_field_RemoveMod_s');
 
                         const l = await this.listSideLoadMod();
