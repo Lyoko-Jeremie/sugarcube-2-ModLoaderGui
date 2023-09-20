@@ -30,6 +30,11 @@ const StringTable = {
     SectionLoadLog: 'Mod加载日志',
 };
 
+const divModCss = `
+#MyConfig_wrapper {
+    padding: 1em;
+}
+`;
 
 export class Gui {
     // avoid same Math.random
@@ -102,7 +107,7 @@ export class Gui {
             },
             'id': 'MyConfig', // The id used for this instance of GM_config
             'title': StringTable.title, // Panel Title
-            css: inlineGMCss + '\n' + (this.isHttpMode ? inlineBootstrap : ''),
+            css: inlineGMCss + '\n' + (this.isHttpMode ? inlineBootstrap : divModCss),
             'frame': (this.isHttpMode ? undefined : this.rootNode),
             'fields': {
                 'Close_b': {
