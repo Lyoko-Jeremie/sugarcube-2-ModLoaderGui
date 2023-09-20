@@ -373,20 +373,21 @@ export class Gui {
         const r: string[] = [];
         for (const T of l) {
             let f = false;
+            const mi = this.gModUtils.getMod(T);
             if (ll && ll.modZipList.has(T)) {
-                r.push(`[Local] ${T}`);
+                r.push(`[Local] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
             }
             if (rl && rl.modZipList.has(T)) {
-                r.push(`[Remote] ${T}`);
+                r.push(`[Remote] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
             }
             if (idl && idl.modZipList.has(T)) {
-                r.push(`[SideLoad IndexDB] ${T}`);
+                r.push(`[SideLoad IndexDB] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
             }
             if (lsl && lsl.modZipList.has(T)) {
-                r.push(`[SideLoad LocalStorage] ${T}`);
+                r.push(`[SideLoad LocalStorage] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
             }
             if (!f) {
