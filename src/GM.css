@@ -1,7 +1,11 @@
 
-html, body, #MyConfig {
+#MyConfig {
     /*background-color: #262626;*/
     background-color: rgb(128, 128, 128);
+}
+
+#MyConfig input {
+    color: black;
 }
 
 /** {*/
@@ -63,7 +67,7 @@ html, body, #MyConfig {
     display: none !important;
 }
 
-#startBanner {
+#startBannerModLoaderGui {
     position: fixed;
     right: 1px;
     bottom: 1px;

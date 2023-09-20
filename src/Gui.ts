@@ -59,7 +59,12 @@ export class Gui {
                 }
             }
         });
+        this.isHttpMode = location.protocol.startsWith('http');
     }
+
+    isHttpMode = true;
+
+    rootNode?: HTMLDivElement;
 
     gui?: GM_configStruct;
 
@@ -68,6 +73,12 @@ export class Gui {
     }
 
     async createGui() {
+        if (!this.rootNode) {
+            this.rootNode = document.createElement('div');
+            // this.rootNode.id = 'rootNodeModLoaderGui';
+            this.rootNode.style.cssText = 'z-index: 1002;';
+            document.body.appendChild(this.rootNode);
+        }
         const NowLoadedModeList = this.getModListString().join('\n');
         const l = await this.listSideLoadMod();
         const NowSideLoadModeList: string = l.join('\n');
@@ -91,7 +102,8 @@ export class Gui {
             },
             'id': 'MyConfig', // The id used for this instance of GM_config
             'title': StringTable.title, // Panel Title
-            css: inlineGMCss + '\n' + inlineBootstrap,
+            css: inlineGMCss + '\n' + (this.isHttpMode ? inlineBootstrap : ''),
+            'frame': (this.isHttpMode ? undefined : this.rootNode),
             'fields': {
                 'Close_b': {
                     label: StringTable.close,
@@ -153,7 +165,8 @@ export class Gui {
                         }
                         console.log(vv);
                         console.log((vv as any).files);
-                        const doc = this.gui!.frame?.contentDocument;
+                        // @ts-ignore
+                        const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
                         if (!doc) {
                             console.error('AddMod_b (!doc) : ', this.gui!.frame);
                             return;
@@ -164,7 +177,7 @@ export class Gui {
                             this.gui!.fields['AddMod_R'].value = `Success. 刷新页面后生效`;
                             this.gui!.fields['AddMod_R'].reload();
                             // console.log('this.gModUtils.getModLoadController().listModLocalStorage()', this.gModUtils.getModLoadController().listModLocalStorage());
-                            // const MyConfig_field_NowSideLoadModeList_r = doc.getElementById('MyConfig_field_NowSideLoadModeList_r');
+                            // const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
                             // if (MyConfig_field_NowSideLoadModeList_r) {
                             //     (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value =
                             //         this.gModUtils.getModLoadController().listModLocalStorage().join('\n');
@@ -177,7 +190,7 @@ export class Gui {
                             this.gui!.fields['AddMod_R'].reload();
                         }
                         const l = await this.listSideLoadMod();
-                        const MyConfig_field_RemoveMod_s = doc.getElementById('MyConfig_field_RemoveMod_s');
+                        const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
                             for (let a in select.options) {
@@ -187,7 +200,7 @@ export class Gui {
                                 select.options.add(new Option(T, T));
                             }
                         }
-                        const MyConfig_field_NowSideLoadModeList_r = doc.getElementById('MyConfig_field_NowSideLoadModeList_r');
+                        const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
                             (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = l.join('\n');
                         }
@@ -217,7 +230,8 @@ export class Gui {
                     label: StringTable.RemoveMod,
                     type: 'button',
                     click: async () => {
-                        const doc = this.gui!.frame?.contentDocument;
+                        // @ts-ignore
+                        const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
                         if (!doc) {
                             console.error('AddMod_b (!doc) : ', this.gui!.frame);
                             return;
@@ -231,7 +245,7 @@ export class Gui {
                             return;
                         }
                         await this.gModUtils.getModLoadController().removeModIndexDB(vv);
-                        const MyConfig_field_RemoveMod_s = doc.getElementById('MyConfig_field_RemoveMod_s');
+                        const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
 
                         const l = await this.listSideLoadMod();
                         if (MyConfig_field_RemoveMod_s) {
@@ -243,7 +257,7 @@ export class Gui {
                                 select.options.add(new Option(T, T));
                             }
                         }
-                        const MyConfig_field_NowSideLoadModeList_r = doc.getElementById('MyConfig_field_NowSideLoadModeList_r');
+                        const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
                             (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = l.join('\n');
                         }
@@ -269,17 +283,19 @@ export class Gui {
                     // for (i in values) alert(values[i]);
                 },
                 open: (doc) => {
-                    doc.addEventListener('keydown', async (event) => {
-                        // console.log('keydown', event);
-                        if (event.altKey && (event.key === 'M' || event.key === 'm')) {
-                            if (this.gui && this.gui.isOpen) {
-                                this.gui.close();
-                            } else {
-                                await this.createGui();
-                                this.gui && this.gui.open();
+                    if (this.isHttpMode) {
+                        doc.addEventListener('keydown', async (event) => {
+                            // console.log('keydown', event);
+                            if (event.altKey && (event.key === 'M' || event.key === 'm')) {
+                                if (this.gui && this.gui.isOpen) {
+                                    this.gui.close();
+                                } else {
+                                    await this.createGui();
+                                    this.gui && this.gui.open();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 },
             },
         });
@@ -308,9 +324,9 @@ export class Gui {
         });
         if (true) {
             this.startBanner = document.createElement('div');
-            this.startBanner.id = 'startBanner';
+            this.startBanner.id = 'startBannerModLoaderGui';
             this.startBanner.innerText = StringTable.title;
-            this.startBanner.style.cssText = 'position: fixed;left: 1px;bottom: calc(1px + 1em);' +
+            this.startBanner.style.cssText = 'position: fixed;left: 1px;bottom: calc(1px + 1em);max-width: 10em;' +
                 'font-size: .75em;z-index: 1001;user-select: none;' +
                 'border: gray dashed 2px;color: gray;padding: .25em;';
             this.startBanner.addEventListener('click', async () => {
