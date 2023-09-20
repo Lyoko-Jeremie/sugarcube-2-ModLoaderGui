@@ -4,10 +4,6 @@
     background-color: rgb(128, 128, 128);
 }
 
-#MyConfig input {
-    color: black;
-}
-
 /** {*/
 /*    color: whitesmoke;*/
 /*}*/
@@ -29,6 +25,7 @@
 }
 
 #MyConfig input[type="text"] {
+    color: black;
     background-color: lightgrey;
 }
 
