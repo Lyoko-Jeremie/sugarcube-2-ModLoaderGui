@@ -6,15 +6,21 @@ export class PassageTracer {
     ) {
         console.log('PassageTracer() this.thisW.jQuery', this.thisW.jQuery);
         console.log('PassageTracer() this.thisW.jQuery(document)', this.thisW.jQuery(document));
-        this.thisW.jQuery(document).on(":passageinit", () => {
+        this.thisW.jQuery(document).on(":passageend", () => {
             this.newPassageCome();
         });
     }
 
-    whenPassageComeCallback: whenPassageCome[] = [];
+    private whenPassageComeCallback: whenPassageCome[] = [];
+
+    addCallback(cb: whenPassageCome) {
+        this.whenPassageComeCallback.push(cb);
+    }
 
     newPassageCome() {
         const pe = Array.from(document.getElementsByClassName('passage'));
+        // console.log('newPassageCome() pe', pe);
+        // console.log('newPassageCome() pe', document.getElementsByClassName('passage'));
         if (pe.length !== 1) {
             console.log('newPassageCome() (pe.length !== 0)', pe);
             return;
@@ -41,11 +47,5 @@ export class PassageTracer {
             cb(dpName);
         }
     }
-
-    // document.getElementsByClassName('passage')
-
-    // :passageinit
-    // stall_cost
-    // enemytrust
 
 }

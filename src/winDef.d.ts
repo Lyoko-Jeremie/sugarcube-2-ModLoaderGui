@@ -9,6 +9,7 @@ declare global {
 
         modLoaderGui: Gui;
         modLoaderGui_LoadingProgress: LoadingProgress;
+        modLoaderGui_PassageTracer: PassageTracer;
 
         jQuery: jQuery;
     }

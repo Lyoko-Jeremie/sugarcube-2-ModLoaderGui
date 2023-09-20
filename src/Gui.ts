@@ -7,6 +7,7 @@ import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
 import {isString, isSafeInteger, isNil} from "lodash";
 import {LoadingProgress} from "./LoadingProgress";
+import {PassageTracer} from "./PassageTracer";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -43,8 +44,21 @@ export class Gui {
         public gSC2DataManager: SC2DataManager,
         public gModUtils: ModUtils,
         public gLoadingProgress: LoadingProgress,
+        public gPassageTracer: PassageTracer,
     ) {
         this.init();
+        this.gPassageTracer.addCallback((passageName) => {
+            if (this.startBanner) {
+                switch (passageName) {
+                    case 'Start':
+                        this.startBanner.style.display = 'block';
+                        break;
+                    default:
+                        this.startBanner.style.display = 'none';
+                        break;
+                }
+            }
+        });
     }
 
     gui?: GM_configStruct;
@@ -293,13 +307,13 @@ export class Gui {
             }
         });
         if (true) {
-            const startBanner = document.createElement('div');
-            startBanner.id = 'startBanner';
-            startBanner.innerText = StringTable.title;
-            startBanner.style.cssText = 'position: fixed;left: 1px;bottom: calc(1px + 1em);' +
+            this.startBanner = document.createElement('div');
+            this.startBanner.id = 'startBanner';
+            this.startBanner.innerText = StringTable.title;
+            this.startBanner.style.cssText = 'position: fixed;left: 1px;bottom: calc(1px + 1em);' +
                 'font-size: .75em;z-index: 1001;user-select: none;' +
                 'border: gray dashed 2px;color: gray;padding: .25em;';
-            startBanner.addEventListener('click', async () => {
+            this.startBanner.addEventListener('click', async () => {
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
                 } else {
@@ -307,9 +321,11 @@ export class Gui {
                     this.gui && this.gui.open();
                 }
             });
-            document.body.appendChild(startBanner);
+            document.body.appendChild(this.startBanner);
         }
     }
+
+    startBanner?: HTMLDivElement;
 
     async loadAndAddMod(htmlFile: HTMLInputElement) {
         try {
