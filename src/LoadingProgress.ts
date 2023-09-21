@@ -1,6 +1,12 @@
-import {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
-import {ModUtils} from "../../../dist-BeforeSC2/Utils";
+import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
+import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {LifeTimeCircleHook} from "../../../dist-BeforeSC2/ModLoadController";
+import moment from "moment";
+
+export interface LogItem {
+    time: moment.Moment;
+    str: string;
+}
 
 export class LoadingProgress implements LifeTimeCircleHook {
     constructor(
@@ -39,55 +45,81 @@ export class LoadingProgress implements LifeTimeCircleHook {
         }
     }
 
-    logList: string[] = [];
+    logList: LogItem[] = [];
 
     getLoadLog() {
-        return this.logList;
+        return this.logList.map(T => {
+            return `${T.time.format('HH:mm:ss.SSS')} ${T.str}`;
+        });
     }
 
     update() {
         if (this.logNode) {
-            this.logNode.innerText = this.logList.join('\n');
+            this.logNode.innerText = this.getLoadLog().join('\n');
         }
     }
 
     InjectEarlyLoad_start(modName: string, fileName: string): void {
-        this.logList.push(`InjectEarlyLoad_start [${modName}] [${fileName}]`);
+        this.logList.push({
+            str: `InjectEarlyLoad_start [${modName}] [${fileName}]`,
+            time: moment(),
+        });
         this.update();
     }
 
     InjectEarlyLoad_end(modName: string, fileName: string): void {
-        this.logList.push(`InjectEarlyLoad_end [${modName}] [${fileName}]`);
+        this.logList.push({
+            str: `InjectEarlyLoad_  end [${modName}] [${fileName}]`,
+            time: moment(),
+        });
         this.update();
     }
 
     EarlyLoad_start(modName: string, fileName: string): void {
-        this.logList.push(`EarlyLoad_start [${modName}] [${fileName}]`);
+        this.logList.push({
+            str: `EarlyLoad_start [${modName}] [${fileName}]`,
+            time: moment(),
+        });
         this.update();
     }
 
     EarlyLoad_end(modName: string, fileName: string): void {
-        this.logList.push(`EarlyLoad_end [${modName}] [${fileName}]`);
+        this.logList.push({
+            str: `EarlyLoad_  end [${modName}] [${fileName}]`,
+            time: moment(),
+        });
         this.update();
     }
 
     Load_start(modName: string, fileName: string): void {
-        this.logList.push(`Load_start [${modName}] [${fileName}]`);
+        this.logList.push({
+            str: `Load_start [${modName}] [${fileName}]`,
+            time: moment(),
+        });
         this.update();
     }
 
     Load_end(modName: string, fileName: string): void {
-        this.logList.push(`Load_end [${modName}] [${fileName}]`);
+        this.logList.push({
+            str: `Load_  end [${modName}] [${fileName}]`,
+            time: moment(),
+        });
         this.update();
     }
 
     PatchModToGame_start(): void {
-        this.logList.push(`PatchModToGame_start`);
+        this.logList.push({
+            str: `PatchModToGame_start`,
+            time: moment(),
+        });
         this.update();
     }
 
     PatchModToGame_end(): void {
-        this.logList.push(`PatchModToGame_end`);
+        this.logList.push({
+            str: `PatchModToGame_  end`,
+            time: moment(),
+        });
         this.update();
     }
 }

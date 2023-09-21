@@ -6,8 +6,10 @@ import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
 import {isString, isSafeInteger, isNil} from "lodash";
+import moment from "moment";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
+import {DebugExport} from "./DebugExport";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -24,10 +26,12 @@ const StringTable = {
     RemoveMod: '移除选定的旁加载Mod',
 
     LoadLog: '加载日志',
+    DownloadExportData: '导出当前所有数据以检查错误',
 
     SectionMod: 'Mod管理',
     SectionAddRemove: '添加/移除Mod',
     SectionLoadLog: 'Mod加载日志',
+    SectionDebug: '故障诊断',
 };
 
 const divModCss = `
@@ -44,6 +48,8 @@ export class Gui {
     rId() {
         return '' + (++Gui.rIdP) + Math.random();
     }
+
+    debugExport: DebugExport;
 
     constructor(
         public gSC2DataManager: SC2DataManager,
@@ -65,6 +71,7 @@ export class Gui {
             }
         });
         this.isHttpMode = location.protocol.startsWith('http');
+        this.debugExport = new DebugExport(gSC2DataManager, gModUtils, gLoadingProgress);
     }
 
     isHttpMode = true;
@@ -281,6 +288,23 @@ export class Gui {
                     type: 'textarea',
                     default: this.gLoadingProgress.getLoadLog().join('\n'),
                     readonly: "readonly",
+                },
+                [this.rId()]: {
+                    section: GM_config.create(StringTable.SectionDebug),
+                    type: 'br',
+                },
+                'DownloadExportData_b': {
+                    label: StringTable.DownloadExportData,
+                    type: 'button',
+                    click: async () => {
+                        this.debugExport.createDownload(
+                            await this.debugExport.exportData(),
+                            `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
+                        )
+                    },
+                    // cssStyleText: 'display: inline-block;',
+                    cssClassName: 'd-inline',
+                    xgmExtendField: {bootstrap: {btnType: btnType}},
                 },
             },
             events: {
