@@ -6,6 +6,7 @@ import moment from "moment";
 export interface LogItem {
     time: moment.Moment;
     str: string;
+    type?: 'info' | 'warning' | 'error';
 }
 
 export class LoadingProgress implements LifeTimeCircleHook {
@@ -119,6 +120,49 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.logList.push({
             str: `PatchModToGame_  end`,
             time: moment(),
+        });
+        this.update();
+    }
+
+    ReplacePatcher_start(): void {
+        this.logList.push({
+            str: `ReplacePatcher_start`,
+            time: moment(),
+        });
+        this.update();
+    }
+
+    ReplacePatcher_end(): void {
+        this.logList.push({
+            str: `ReplacePatcher_  end`,
+            time: moment(),
+        });
+        this.update();
+    }
+
+    logError(s: string): void {
+        this.logList.push({
+            str: `logError ${s}`,
+            time: moment(),
+            type: 'error',
+        });
+        this.update();
+    }
+
+    logInfo(s: string): void {
+        this.logList.push({
+            str: `logInfo ${s}`,
+            time: moment(),
+            type: 'info',
+        });
+        this.update();
+    }
+
+    logWarning(s: string): void {
+        this.logList.push({
+            str: `logWarning ${s}`,
+            time: moment(),
+            type: 'warning',
         });
         this.update();
     }
