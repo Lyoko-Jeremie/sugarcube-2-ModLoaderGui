@@ -105,8 +105,8 @@ export class Gui {
                     noReset: true,
                 },
             },
-            'id': 'MyConfig', // The id used for this instance of GM_config
-            'title': StringTable.title, // Panel Title
+            'id': 'MyConfig',
+            'title': StringTable.title + (this.gModUtils.version || ''),
             css: inlineGMCss + '\n' + (this.isHttpMode ? inlineBootstrap : divModCss),
             'frame': (this.isHttpMode ? undefined : this.rootNode),
             'fields': {
