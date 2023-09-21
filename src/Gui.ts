@@ -27,6 +27,7 @@ const StringTable = {
 
     LoadLog: '加载日志',
     DownloadExportData: '导出当前所有数据以检查错误',
+    DownloadExportData2: '导出当前所有数据以检查错误2',
 
     SectionMod: 'Mod管理',
     SectionAddRemove: '添加/移除Mod',
@@ -299,6 +300,19 @@ export class Gui {
                     click: async () => {
                         this.debugExport.createDownload(
                             await this.debugExport.exportData(),
+                            `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
+                        )
+                    },
+                    // cssStyleText: 'display: inline-block;',
+                    cssClassName: 'd-inline',
+                    xgmExtendField: {bootstrap: {btnType: btnType}},
+                },
+                'DownloadExportData2_b': {
+                    label: StringTable.DownloadExportData2,
+                    type: 'button',
+                    click: async () => {
+                        this.debugExport.createDownload(
+                            await this.debugExport.exportData(true),
                             `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
                         )
                     },

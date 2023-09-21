@@ -11,7 +11,7 @@ export class DebugExport {
     ) {
     }
 
-    async exportData() {
+    async exportData(passageDir = false) {
         const zip = new JSZip();
 
         this.gSC2DataManager.flushAfterPatchCache();
@@ -23,11 +23,18 @@ export class DebugExport {
             zip.file(`js/${item.name}`, item.content);
         }
         for (const item of sc.passageDataItems.items) {
-            console.log('passage', [item.name, item.content]);
-            zip.file(
-                `passage/${item.name}.twee`,
-                `:: ${item.name}\n${item.content}`,
-            );
+            // console.log('passage', [item.name, item.content]);
+            if (!passageDir) {
+                zip.file(
+                    `passage/${item.name}.twee`,
+                    `:: ${item.name}\n${item.content}`,
+                );
+            } else {
+                zip.file(
+                    `passage/${item.name.split(' ')[0]}/${item.name}.twee`,
+                    `:: ${item.name}\n${item.content}`,
+                );
+            }
         }
         this.gSC2DataManager.flushAfterPatchCache();
 
