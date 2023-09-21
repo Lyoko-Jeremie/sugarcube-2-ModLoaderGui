@@ -16,6 +16,16 @@ export class DebugExport {
 
         this.gSC2DataManager.flushAfterPatchCache();
         const sc = this.gSC2DataManager.getSC2DataInfoAfterPatch();
+
+        zip.file(`tree.json`, JSON.stringify(
+            {
+                css: sc.styleFileItems.items.map(T => T.name),
+                js: sc.scriptFileItems.items.map(T => T.name),
+                passage: sc.passageDataItems.items.map(T => T.name),
+            },
+            undefined, 2,
+        ));
+
         for (const item of sc.styleFileItems.items) {
             zip.file(`css/${item.name}`, item.content);
         }
