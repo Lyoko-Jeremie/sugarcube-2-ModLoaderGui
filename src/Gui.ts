@@ -93,6 +93,7 @@ export class Gui {
             console.log('createGui() (this.gui && this.gui.isOpen)');
             this.gui.close()
         }
+        console.log('title', StringTable.title + (this.gModUtils.version || ''));
         this.gui = new GM_config({
             xgmExtendInfo: {
                 xgmExtendMode: 'bootstrap',
