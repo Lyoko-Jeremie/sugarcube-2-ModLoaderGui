@@ -425,7 +425,7 @@ export class Gui {
         if (true) {
             this.startBanner = document.createElement('div');
             this.startBanner.id = 'startBannerModLoaderGui';
-            this.startBanner.innerText = StringTable.title;
+            this.startBanner.innerText = StringTable.title + (this.gModUtils.version || '');
             this.startBanner.style.cssText = 'position: fixed;left: 1px;bottom: calc(1px + 1em);max-width: 10em;' +
                 'font-size: .75em;z-index: 1001;user-select: none;' +
                 'border: gray dashed 2px;color: gray;padding: .25em;';
