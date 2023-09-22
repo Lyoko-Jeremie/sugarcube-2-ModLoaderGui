@@ -124,17 +124,17 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    ReplacePatcher_start(): void {
+    ReplacePatcher_start(modName: string, fileName: string): void {
         this.logList.push({
-            str: `ReplacePatcher_start`,
+            str: `ReplacePatcher_start [${modName}] [${fileName}]`,
             time: moment(),
         });
         this.update();
     }
 
-    ReplacePatcher_end(): void {
+    ReplacePatcher_end(modName: string, fileName: string): void {
         this.logList.push({
-            str: `ReplacePatcher_  end`,
+            str: `ReplacePatcher_  end [${modName}] [${fileName}]`,
             time: moment(),
         });
         this.update();
