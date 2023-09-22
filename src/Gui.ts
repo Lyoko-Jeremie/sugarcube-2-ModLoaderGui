@@ -487,5 +487,13 @@ export class Gui {
         return r;
     }
 
+    getModTReadMe(name: string) {
+        const mod = this.gModUtils.getMod(name);
+        if (!mod) {
+            return '';
+        }
+        const addstionFile = mod.bootJson.additionFile;
+    }
+
 }
 
