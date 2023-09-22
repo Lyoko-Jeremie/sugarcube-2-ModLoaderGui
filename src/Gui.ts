@@ -5,11 +5,12 @@ import inlineBootstrap from 'bootstrap/dist/css/bootstrap.css?inlineText';
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
-import {isString, isSafeInteger, isNil} from "lodash";
+import {isString, isSafeInteger, isNil, isArray, isEqual} from "lodash";
 import moment from "moment";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
 import {DebugExport} from "./DebugExport";
+import {ModZipReader} from '../../../dist-BeforeSC2/ModZipReader';
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -25,14 +26,21 @@ const StringTable = {
     CanRemoveModList: '可移除的旁加载Mod列表：',
     RemoveMod: '移除选定的旁加载Mod',
 
+    ReadMeSelect: 'Mod列表：',
+    ReadMeButton: '查看选定Mod的ReadMe',
+    ReadMeContent: 'ReadMe',
+
     LoadLog: '加载日志',
     DownloadExportData: '导出当前所有数据以检查错误',
     DownloadExportData2: '导出当前所有数据以检查错误2',
 
     SectionMod: 'Mod管理',
     SectionAddRemove: '添加/移除Mod',
+    SectionReadMe: 'Mod ReadMe',
     SectionLoadLog: 'Mod加载日志',
     SectionDebug: '故障诊断',
+
+    NoReadMeString: '<<没有ReadMe>>',
 };
 
 const divModCss = `
@@ -247,7 +255,7 @@ export class Gui {
                         // @ts-ignore
                         const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
                         if (!doc) {
-                            console.error('AddMod_b (!doc) : ', this.gui!.frame);
+                            console.error('RemoveMod_b (!doc) : ', this.gui!.frame);
                             return;
                         }
                         const vv = this.gui!.fields['RemoveMod_s'].toValue();
@@ -279,6 +287,54 @@ export class Gui {
                     // cssStyleText: 'display: inline-block;',
                     cssClassName: 'd-inline',
                     xgmExtendField: {bootstrap: {btnType: btnType}},
+                },
+                [this.rId()]: {
+                    section: GM_config.create(StringTable.SectionReadMe),
+                    type: 'br',
+                },
+                ['ReadMe' + '_s']: {
+                    label: StringTable.ReadMeSelect,
+                    type: 'select',
+                    labelPos: 'left',
+                    options: this.gModUtils.getModListName(),
+                    default: undefined,
+                    cssClassName: 'd-inline',
+                },
+                ['ReadMe' + '_b']: {
+                    label: StringTable.ReadMeButton,
+                    type: 'button',
+                    click: async () => {
+                        // @ts-ignore
+                        const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
+                        if (!doc) {
+                            console.error('ReadMe_b (!doc) : ', this.gui!.frame);
+                            return;
+                        }
+                        const vv = this.gui!.fields['ReadMe_s'].toValue();
+                        console.log('vv', vv);
+                        if (isNil(vv) || !vv || !isString(vv)) {
+                            console.error('ReadMe_b (!vv) : ', [
+                                isNil(vv), !vv, !isString(vv)
+                            ]);
+                            return;
+                        }
+                        const readMe = await this.getModTReadMe(vv);
+                        // console.log('readMe', readMe);
+
+                        const MyConfig_field_ReadMe_r = doc.querySelector('#MyConfig_field_ReadMe_r');
+                        if (MyConfig_field_ReadMe_r) {
+                            (MyConfig_field_ReadMe_r as HTMLTextAreaElement).value = readMe;
+                        }
+                    },
+                    // cssStyleText: 'display: inline-block;',
+                    cssClassName: 'd-inline',
+                    xgmExtendField: {bootstrap: {btnType: btnType}},
+                },
+                'ReadMe_r': {
+                    label: StringTable.ReadMeContent,
+                    type: 'textarea',
+                    default: '',
+                    readonly: "readonly",
                 },
                 [this.rId()]: {
                     section: GM_config.create(StringTable.SectionLoadLog),
@@ -393,7 +449,7 @@ export class Gui {
             console.log('f', f);
             if (!(f && f.length === 1)) {
                 console.error('loadAndAddMod() (!(f && f.length === 1))');
-                return `Error: ${'loadAndAddMod() (!(f && f.length === 1))'}}`
+                return Promise.reject(`Error: ${'loadAndAddMod() (!(f && f.length === 1))'}}`);
             }
             const file = f[0];
             const data = await new Promise((resolve, reject) => {
@@ -411,7 +467,7 @@ export class Gui {
                 const base64 = data.replace(/^data:[^:;]+;base64,/, '');
                 const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFileIndexDB(base64);
                 if (isString(zipFile)) {
-                    return `Error: ${zipFile}}`
+                    return Promise.reject(`Error: ${zipFile}}`);
                 } else {
                     try {
                         await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, base64);
@@ -487,12 +543,41 @@ export class Gui {
         return r;
     }
 
-    getModTReadMe(name: string) {
+    async getModTReadMe(name: string) {
         const mod = this.gModUtils.getMod(name);
+        // console.log('getModTReadMe()', this.gSC2DataManager.getModLoader().modCache);
+        // console.log('getModTReadMe()', [name, mod]);
         if (!mod) {
-            return '';
+            console.error('getModTReadMe() (!mod)', name);
+            return StringTable.NoReadMeString;
         }
-        const addstionFile = mod.bootJson.additionFile;
+        const additionFile = mod.bootJson.additionFile;
+        if (!additionFile || isArray(additionFile) && additionFile.length === 0) {
+            console.error('getModTReadMe() (!additionFile || isArray(additionFile) && additionFile.length === 0)', [
+                name, mod, additionFile
+            ]);
+            return StringTable.NoReadMeString;
+        }
+        const readme = additionFile.find(T => T.toLowerCase().startsWith('readme'));
+        if (!readme) {
+            console.error('getModTReadMe() (!readme)', name);
+            return StringTable.NoReadMeString;
+        }
+        const modZips = this.gModUtils.getModZip(name);
+        if (!modZips || modZips.length === 0) {
+            // never go there
+            console.error('getModTReadMe() (!modZips || modZips.length === 0)', name);
+            return StringTable.NoReadMeString;
+        }
+        const zip = modZips.find((T: ModZipReader) => isEqual(T.getModInfo()?.bootJson, mod.bootJson));
+        if (!zip) {
+            // never go there
+            console.error('getModTReadMe() (!zip)', [name, modZips, mod]);
+            return StringTable.NoReadMeString;
+        }
+        const readmeFile = zip.getZipFile().file(readme);
+        // console.log('readmeFile', readmeFile?.async('string'));
+        return await readmeFile?.async('string') || StringTable.NoReadMeString;
     }
 
 }
