@@ -1,14 +1,19 @@
+import type {AddonPluginManager} from "../../../dist-BeforeSC2/AddonPlugin";
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {LoadingProgress} from "./LoadingProgress";
 import JSZip from 'jszip';
 
 export class DebugExport {
+
+    public addonPluginManager: AddonPluginManager;
+
     constructor(
         public gSC2DataManager: SC2DataManager,
         public gModUtils: ModUtils,
         public gLoadingProgress: LoadingProgress,
     ) {
+        this.addonPluginManager = this.gSC2DataManager.getAddonPluginManager();
     }
 
     async exportData(passageDir = false) {
@@ -47,6 +52,8 @@ export class DebugExport {
             }
         }
         this.gSC2DataManager.flushAfterPatchCache();
+
+        await this.addonPluginManager.exportDataZip(zip);
 
         const blob = await zip.generateAsync({
             type: "blob",
