@@ -387,6 +387,12 @@ export class Gui {
                         doc.addEventListener('keydown', async (event) => {
                             // console.log('keydown', event);
                             if (event.altKey && (event.key === 'M' || event.key === 'm')) {
+                                if (event.shiftKey) {
+                                    if (this.gui && this.gui.isOpen) {
+                                        this.gui.close();
+                                    }
+                                    return;
+                                }
                                 if (this.gui && this.gui.isOpen) {
                                     this.gui.close();
                                 } else {
@@ -414,9 +420,16 @@ export class Gui {
         window.addEventListener('keydown', async (event) => {
             console.log('keydown', event);
             if (event.altKey && (event.key === 'M' || event.key === 'm')) {
+                if (event.shiftKey) {
+                    if (this.gui && this.gui.isOpen) {
+                        this.gui.close();
+                    }
+                    return;
+                }
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
                 } else {
+                    this.gui && this.gui.close();
                     await this.createGui();
                     this.gui && this.gui.open();
                 }
@@ -433,6 +446,7 @@ export class Gui {
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
                 } else {
+                    this.gui && this.gui.close();
                     await this.createGui();
                     this.gui && this.gui.open();
                 }
