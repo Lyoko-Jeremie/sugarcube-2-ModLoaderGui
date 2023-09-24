@@ -383,6 +383,35 @@ export class Gui {
                     // for (i in values) alert(values[i]);
                 },
                 open: (doc) => {
+                    const loadLogNode = this.gui!.fields['LoadLog_r'].node;
+                    console.log('loadLogNode', loadLogNode);
+                    console.log('loadLogNode', loadLogNode?.parentNode);
+                    if (loadLogNode && loadLogNode.parentNode) {
+                        const pn = loadLogNode?.parentNode;
+                        pn.removeChild(loadLogNode);
+                        const n = document.createElement('div');
+                        n.style.cssText = 'font-family: "Consolas", monospace;';
+                        const ll = this.gLoadingProgress.getLoadLogHtml();
+                        ll.filter(T => {
+                            switch (T.style.color) {
+                                case 'orange':
+                                    T.style.color = 'whitesmoke';
+                                    T.style.backgroundColor = 'chocolate';
+                                    break;
+                                case 'red':
+                                    T.style.color = 'whitesmoke';
+                                    T.style.backgroundColor = 'firebrick';
+                                    break;
+                                case 'gray':
+                                    T.style.color = 'mistyrose';
+                                    break;
+                                default:
+                                    break;
+                            }
+                        });
+                        n.append(...ll);
+                        pn.appendChild(n);
+                    }
                     if (this.isHttpMode) {
                         doc.addEventListener('keydown', async (event) => {
                             // console.log('keydown', event);

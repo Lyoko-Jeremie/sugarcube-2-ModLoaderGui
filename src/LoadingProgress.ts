@@ -48,6 +48,18 @@ export class LoadingProgress implements LifeTimeCircleHook {
 
     logList: LogItem[] = [];
 
+    getLoadLogHtml() {
+        return this.logList.map(T => {
+            const time = T.time.format('HH:mm:ss.SSS');
+            const type = T.type;
+            const str = T.str;
+            const node = document.createElement('div');
+            node.style.cssText = `color: ${type === 'error' ? 'red' : type === 'warning' ? 'orange' : 'gray'};`;
+            node.innerText = `${time} ${str}`;
+            return node;
+        });
+    }
+
     getLoadLog() {
         return this.logList.map(T => {
             return `${T.time.format('HH:mm:ss.SSS')} ${T.str}`;
@@ -56,7 +68,8 @@ export class LoadingProgress implements LifeTimeCircleHook {
 
     update() {
         if (this.logNode) {
-            this.logNode.innerText = this.getLoadLog().join('\n');
+            this.logNode.innerHTML = '';
+            this.logNode.append(...this.getLoadLogHtml());
         }
     }
 
@@ -150,7 +163,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
 
     logError(s: string): void {
         this.logList.push({
-            str: `logError ${s}`,
+            str: `[[logError]] ${s}`,
             time: moment(),
             type: 'error',
         });
@@ -159,7 +172,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
 
     logInfo(s: string): void {
         this.logList.push({
-            str: `logInfo ${s}`,
+            str: `[[logInfo]] ${s}`,
             time: moment(),
             type: 'info',
         });
@@ -168,7 +181,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
 
     logWarning(s: string): void {
         this.logList.push({
-            str: `logWarning ${s}`,
+            str: `[[logWarning]] ${s}`,
             time: moment(),
             type: 'warning',
         });
