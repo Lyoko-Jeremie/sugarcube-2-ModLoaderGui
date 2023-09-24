@@ -534,21 +534,30 @@ export class Gui {
         for (const T of l) {
             let f = false;
             const mi = this.gModUtils.getMod(T);
+            const rr: string[] = [];
             if (ll && ll.modZipList.has(T)) {
-                r.push(`[Local] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[Local] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
             }
             if (rl && rl.modZipList.has(T)) {
-                r.push(`[Remote] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[Remote] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
             }
             if (idl && idl.modZipList.has(T)) {
-                r.push(`[SideLoad IndexDB] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[SideLoad IndexDB] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
             }
             if (lsl && lsl.modZipList.has(T)) {
-                r.push(`[SideLoad LocalStorage] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[SideLoad LocalStorage] ${T} {v:${mi?.version || '?'}}`);
                 f = true;
+            }
+            if (rr.length === 1) {
+                r.push(...rr);
+            } else {
+                for (let i = 0; i < rr.length - 1; i++) {
+                    r.push('[Overwritten]' + rr[i]);
+                }
+                r.push(rr[rr.length - 1]);
             }
             if (!f) {
                 r.push(`[?] ${T}`);
