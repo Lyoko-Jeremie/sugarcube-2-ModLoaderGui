@@ -60,7 +60,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         }
     }
 
-    InjectEarlyLoad_start(modName: string, fileName: string): void {
+    async InjectEarlyLoad_start(modName: string, fileName: string) {
         this.logList.push({
             str: `InjectEarlyLoad_start [${modName}] [${fileName}]`,
             time: moment(),
@@ -68,7 +68,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    InjectEarlyLoad_end(modName: string, fileName: string): void {
+    async InjectEarlyLoad_end(modName: string, fileName: string) {
         this.logList.push({
             str: `InjectEarlyLoad_  end [${modName}] [${fileName}]`,
             time: moment(),
@@ -76,7 +76,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    EarlyLoad_start(modName: string, fileName: string): void {
+    async EarlyLoad_start(modName: string, fileName: string) {
         this.logList.push({
             str: `EarlyLoad_start [${modName}] [${fileName}]`,
             time: moment(),
@@ -84,7 +84,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    EarlyLoad_end(modName: string, fileName: string): void {
+    async EarlyLoad_end(modName: string, fileName: string) {
         this.logList.push({
             str: `EarlyLoad_  end [${modName}] [${fileName}]`,
             time: moment(),
@@ -92,7 +92,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    Load_start(modName: string, fileName: string): void {
+    async Load_start(modName: string, fileName: string) {
         this.logList.push({
             str: `Load_start [${modName}] [${fileName}]`,
             time: moment(),
@@ -100,7 +100,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    Load_end(modName: string, fileName: string): void {
+    async Load_end(modName: string, fileName: string) {
         this.logList.push({
             str: `Load_  end [${modName}] [${fileName}]`,
             time: moment(),
@@ -108,7 +108,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    PatchModToGame_start(): void {
+    async PatchModToGame_start() {
         this.logList.push({
             str: `PatchModToGame_start`,
             time: moment(),
@@ -116,7 +116,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    PatchModToGame_end(): void {
+    async PatchModToGame_end() {
         this.logList.push({
             str: `PatchModToGame_  end`,
             time: moment(),
@@ -124,7 +124,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    ReplacePatcher_start(modName: string, fileName: string): void {
+    async ReplacePatcher_start(modName: string, fileName: string) {
         this.logList.push({
             str: `ReplacePatcher_start [${modName}] [${fileName}]`,
             time: moment(),
@@ -132,7 +132,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    ReplacePatcher_end(modName: string, fileName: string): void {
+    async ReplacePatcher_end(modName: string, fileName: string) {
         this.logList.push({
             str: `ReplacePatcher_  end [${modName}] [${fileName}]`,
             time: moment(),
@@ -140,7 +140,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
-    ModLoaderLoadEnd(): void {
+    async ModLoaderLoadEnd() {
         this.logList.push({
             str: `ModLoaderLoadEnd.  Press [Alt+M] to open ModLoader GUI.`,
             time: moment(),
