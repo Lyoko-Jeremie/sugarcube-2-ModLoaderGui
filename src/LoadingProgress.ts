@@ -140,6 +140,14 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.update();
     }
 
+    ModLoaderLoadEnd(): void {
+        this.logList.push({
+            str: `ModLoaderLoadEnd.  Press [Alt+M] to open ModLoader GUI.`,
+            time: moment(),
+        });
+        this.update();
+    }
+
     logError(s: string): void {
         this.logList.push({
             str: `logError ${s}`,
