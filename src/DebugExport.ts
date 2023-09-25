@@ -1,4 +1,5 @@
 import type {AddonPluginManager} from "../../../dist-BeforeSC2/AddonPlugin";
+import { ModLoadController } from "../../../dist-BeforeSC2/ModLoadController";
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {LoadingProgress} from "./LoadingProgress";
@@ -7,6 +8,7 @@ import JSZip from 'jszip';
 export class DebugExport {
 
     public addonPluginManager: AddonPluginManager;
+    public modLoadController: ModLoadController;
 
     constructor(
         public gSC2DataManager: SC2DataManager,
@@ -14,6 +16,7 @@ export class DebugExport {
         public gLoadingProgress: LoadingProgress,
     ) {
         this.addonPluginManager = this.gSC2DataManager.getAddonPluginManager();
+        this.modLoadController = this.gSC2DataManager.getModLoadController();
     }
 
     async exportData(passageDir = false) {
@@ -54,6 +57,7 @@ export class DebugExport {
         this.gSC2DataManager.flushAfterPatchCache();
 
         await this.addonPluginManager.exportDataZip(zip);
+        await this.modLoadController.exportDataZip(zip);
 
         const blob = await zip.generateAsync({
             type: "blob",
