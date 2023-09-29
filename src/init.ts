@@ -10,5 +10,6 @@ window.modLoaderGui = new Gui(
     window.modUtils,
     window.modLoaderGui_LoadingProgress,
     window.modLoaderGui_PassageTracer,
+    window,
 );
 

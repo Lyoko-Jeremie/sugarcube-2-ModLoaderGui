@@ -65,6 +65,7 @@ export class Gui {
         public gModUtils: ModUtils,
         public gLoadingProgress: LoadingProgress,
         public gPassageTracer: PassageTracer,
+        public thisWin: Window,
     ) {
         this.init();
         this.gPassageTracer.addCallback((passageName) => {
@@ -446,7 +447,7 @@ export class Gui {
         }
         this.initOk = true;
 
-        window.addEventListener('keydown', async (event) => {
+        this.thisWin.addEventListener('keydown', async (event) => {
             console.log('keydown', event);
             if (event.altKey && (event.key === 'M' || event.key === 'm')) {
                 if (event.shiftKey) {
