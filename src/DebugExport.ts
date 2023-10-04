@@ -1,5 +1,5 @@
 import type {AddonPluginManager} from "../../../dist-BeforeSC2/AddonPlugin";
-import { ModLoadController } from "../../../dist-BeforeSC2/ModLoadController";
+import {ModLoadController} from "../../../dist-BeforeSC2/ModLoadController";
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {LoadingProgress} from "./LoadingProgress";
@@ -27,9 +27,30 @@ export class DebugExport {
 
         zip.file(`tree.json`, JSON.stringify(
             {
-                css: sc.styleFileItems.items.map(T => T.name),
-                js: sc.scriptFileItems.items.map(T => T.name),
-                passage: sc.passageDataItems.items.map(T => T.name),
+                css: sc.styleFileItems.items.map(T => {
+                    const a = {
+                        ...T,
+                    };
+                    // @ts-ignore
+                    delete a.content;
+                    return a;
+                }),
+                js: sc.scriptFileItems.items.map(T => {
+                    const a = {
+                        ...T,
+                    };
+                    // @ts-ignore
+                    delete a.content;
+                    return a;
+                }),
+                passage: sc.passageDataItems.items.map(T => {
+                    const a = {
+                        ...T,
+                    };
+                    // @ts-ignore
+                    delete a.content;
+                    return a;
+                }),
             },
             undefined, 2,
         ));
