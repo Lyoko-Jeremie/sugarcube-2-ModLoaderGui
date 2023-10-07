@@ -465,6 +465,16 @@ export class Gui {
                 }
             }
         });
+
+        this.thisWin.addEventListener('keydown', async (event) => {
+            if (event.altKey && event.ctrlKey && (event.key === 'D' || event.key === 'd')) {
+                this.debugExport.createDownload(
+                    await this.debugExport.exportData(),
+                    `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
+                )
+            }
+        });
+
         if (true) {
             this.startBanner = document.createElement('div');
             this.startBanner.id = 'startBannerModLoaderGui';
