@@ -320,18 +320,31 @@ export class Gui {
                             return;
                         }
                         const readMe = await this.getModTReadMe(vv);
+                        const bootJson = await this.getModTJson(vv);
                         // console.log('readMe', readMe);
 
-                        const MyConfig_field_ReadMe_r = doc.querySelector('#MyConfig_field_ReadMe_r');
-                        if (MyConfig_field_ReadMe_r) {
-                            (MyConfig_field_ReadMe_r as HTMLTextAreaElement).value = readMe;
-                        }
+                        (this.gui!.fields['ReadMe_r'].node as HTMLTextAreaElement).value = readMe;
+                        (this.gui!.fields['BootJson_r'].node as HTMLTextAreaElement).value = bootJson;
+                        // const MyConfig_field_ReadMe_r = doc.querySelector('#MyConfig_field_ReadMe_r');
+                        // if (MyConfig_field_ReadMe_r) {
+                        //     (MyConfig_field_ReadMe_r as HTMLTextAreaElement).value = readMe;
+                        // }
+                        // const MyConfig_field_BootJson_r = doc.querySelector('#MyConfig_field_BootJson_r');
+                        // if (MyConfig_field_BootJson_r) {
+                        //     (MyConfig_field_BootJson_r as HTMLTextAreaElement).value = bootJson;
+                        // }
                     },
                     // cssStyleText: 'display: inline-block;',
                     cssClassName: 'd-inline',
                     xgmExtendField: {bootstrap: {btnType: btnType}},
                 },
                 'ReadMe_r': {
+                    label: StringTable.ReadMeContent,
+                    type: 'textarea',
+                    default: '',
+                    readonly: "readonly",
+                },
+                'BootJson_r': {
                     label: StringTable.ReadMeContent,
                     type: 'textarea',
                     default: '',
@@ -641,6 +654,15 @@ export class Gui {
         const readmeFile = zip.getZipFile().file(readme);
         // console.log('readmeFile', readmeFile?.async('string'));
         return await readmeFile?.async('string') || StringTable.NoReadMeString;
+    }
+
+    async getModTJson(name: string) {
+        const mod = this.gModUtils.getMod(name);
+        if (!mod) {
+            console.error('getModTReadMe() (!mod)', name);
+            return StringTable.NoReadMeString;
+        }
+        return JSON.stringify(mod.bootJson, undefined, 2);
     }
 
 }
