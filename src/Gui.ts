@@ -14,7 +14,7 @@ import {ModZipReader} from '../../../dist-BeforeSC2/ModZipReader';
 
 const btnType: BootstrapBtnType = 'secondary';
 
-const StringTable = {
+const StringTable_CN = {
     title: 'Mod管理器',
     close: '关闭',
     reload: '重新载入',
@@ -42,6 +42,46 @@ const StringTable = {
 
     NoReadMeString: '<<没有ReadMe>>',
 };
+
+const StringTable_EN = {
+    title: 'ModLoader Manager',
+    close: 'close',
+    reload: 'reload page',
+    NowLoadedModeList: 'NowLoadedModeList：',
+    NowSideLoadModeList: 'NowSideLoadModeList：（UsableAfterNextPageLoad）',
+    SelectModZipFile: 'SelectModZipFile：',
+    AddMod: 'AddMod',
+    AddModResult: 'AddModResult：',
+    CanRemoveModList: 'CanRemoveModList：',
+    RemoveMod: 'RemoveMod',
+
+    ReadMeSelect: 'ModList：',
+    ReadMeButton: 'ViewSelectedModReadMe',
+    ReadMeContent: 'ReadMe',
+
+    LoadLog: 'LoadLog',
+    DownloadExportData: 'DownloadExportData',
+    DownloadExportData2: 'DownloadExportData2',
+
+    SectionMod: 'ModManage',
+    SectionAddRemove: 'Add/Remove Mod',
+    SectionReadMe: 'Mod ReadMe',
+    SectionLoadLog: 'Mod Load Log',
+    SectionDebug: 'Debug',
+
+    NoReadMeString: '<<No ReadMe>>',
+};
+
+let StringTable = StringTable_CN;
+
+switch (navigator.language) {
+    case 'zh-CN':
+        StringTable = StringTable_CN;
+        break;
+    default:
+        StringTable = StringTable_EN;
+        break;
+}
 
 const divModCss = `
 #MyConfig_wrapper {
