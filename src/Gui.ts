@@ -190,6 +190,8 @@ export class Gui {
                     cssClassName: 'd-inline',
                     xgmExtendField: {bootstrap: {btnType: btnType}},
                 },
+                // TODO language select section
+                // TODO safeMode section
                 [this.rId()]: {
                     section: GM_config.create(StringTable.SectionMod),
                     type: 'br',
@@ -206,6 +208,7 @@ export class Gui {
                     default: NowSideLoadModeList,
                     readonly: "readonly",
                 },
+                // TODO side load mod disable section
                 [this.rId()]: {
                     section: GM_config.create(StringTable.SectionAddRemove),
                     type: 'br',
@@ -598,6 +601,9 @@ export class Gui {
     }
 
     errorMessage2CN(s: string) {
+        if (navigator.language !== 'zh-CN') {
+            return s;
+        }
         if (s.includes('The quota has been exceeded.')) {
             return 'Zip文件过大，无法存储';
         }
