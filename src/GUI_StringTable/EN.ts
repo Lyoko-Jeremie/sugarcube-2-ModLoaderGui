@@ -4,8 +4,16 @@ export const StringTable_EN: StringTableType = {
     title: 'ModLoader Manager',
     close: 'close',
     reload: 'reload page',
+
+    EnableSafeMode: 'EnableSafeMode',
+    DisableSafeMode: 'DisableSafeMode',
+    SafeModeState: 'SafeModeState：',
+    SafeModeEnabled: 'SafeModeEnabled, ModLoader will not load any mod in next page load.',
+    SafeModeAutoEnabled: 'SafeModeAutoEnabled, Last 3 times load failed, ModLoader Auto Enable SafeMode.',
+    SafeModeDisabled: 'SafeModeDisabled',
+
     NowLoadedModeList: 'NowLoadedModeList：',
-    NowSideLoadModeList: 'NowSideLoadModeList：（UsableAfterNextPageLoad）',
+    NowSideLoadModeList: 'NowSideLoadModeList：（Usable After Next Page Load If Enabled）',
     SelectModZipFile: 'SelectModZipFile：',
     AddMod: 'AddMod',
     AddModResult: 'AddModResult：',
@@ -21,7 +29,10 @@ export const StringTable_EN: StringTableType = {
     DownloadExportData2: 'DownloadExportData2',
 
     SectionMod: 'ModManage',
+    SectionSafeMode: 'SafeMode',
+    SectionLanguageSelect: 'Language',
     SectionAddRemove: 'Add/Remove Mod',
+    SectionModDisable: 'ModDisableList',
     SectionReadMe: 'Mod ReadMe',
     SectionLoadLog: 'Mod Load Log',
     SectionDebug: 'Debug',

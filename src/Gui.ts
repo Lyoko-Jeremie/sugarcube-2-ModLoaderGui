@@ -12,6 +12,7 @@ import {PassageTracer} from "./PassageTracer";
 import {DebugExport} from "./DebugExport";
 import {ModZipReader} from '../../../dist-BeforeSC2/ModZipReader';
 import {getStringTable} from './GUI_StringTable/StringTable';
+import {ModLoadSwitch} from "./ModLoadSwitch";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -33,6 +34,8 @@ export class Gui {
     }
 
     debugExport: DebugExport;
+
+    modLoadSwitch: ModLoadSwitch;
 
     constructor(
         public gSC2DataManager: SC2DataManager,
@@ -56,6 +59,7 @@ export class Gui {
         });
         this.isHttpMode = location.protocol.startsWith('http');
         this.debugExport = new DebugExport(gSC2DataManager, gModUtils, gLoadingProgress);
+        this.modLoadSwitch = new ModLoadSwitch(gSC2DataManager, gModUtils);
     }
 
     isHttpMode = true;
@@ -124,8 +128,55 @@ export class Gui {
                     cssClassName: 'd-inline',
                     xgmExtendField: {bootstrap: {btnType: btnType}},
                 },
+                [this.rId()]: {
+                    section: GM_config.create(StringTable.SectionSafeMode),
+                    type: 'br',
+                },
+                'EnableSafeMode_b': {
+                    label: StringTable.EnableSafeMode,
+                    type: 'button',
+                    click: async () => {
+                        console.log('EnableSafeMode_b');
+                        // await 2 next tick
+                        this.modLoadSwitch.enableSafeMode();
+                        if (this.modLoadSwitch.isSafeModeOn()) {
+                            this.gui!.fields['SafeModeState_R'].value = StringTable.SafeModeEnabled;
+                        } else {
+                            this.gui!.fields['SafeModeState_R'].value = StringTable.SafeModeDisabled;
+                        }
+                        this.gui!.fields['SafeModeState_R'].reload();
+                    },
+                    cssClassName: 'd-inline',
+                    xgmExtendField: {bootstrap: {btnType: 'outline-danger'}},
+                },
+                'DisableSafeMode_b': {
+                    label: StringTable.DisableSafeMode,
+                    type: 'button',
+                    click: async () => {
+                        console.log('DisableSafeMode_b');
+                        // await 2 next tick
+                        this.modLoadSwitch.disableSafeMode();
+                        if (this.modLoadSwitch.isSafeModeOn()) {
+                            this.gui!.fields['SafeModeState_R'].value = StringTable.SafeModeEnabled;
+                        } else {
+                            this.gui!.fields['SafeModeState_R'].value = StringTable.SafeModeDisabled;
+                        }
+                        this.gui!.fields['SafeModeState_R'].reload();
+                    },
+                    cssClassName: 'd-inline',
+                    xgmExtendField: {bootstrap: {btnType: 'outline-success'}},
+                },
+                'SafeModeState_R': {
+                    label: StringTable.SafeModeState,
+                    type: 'text',
+                    value: '',
+                    readonly: true,
+                },
                 // TODO language select section
-                // TODO safeMode section
+                [this.rId()]: {
+                    section: GM_config.create(StringTable.SectionLanguageSelect),
+                    type: 'br',
+                },
                 [this.rId()]: {
                     section: GM_config.create(StringTable.SectionMod),
                     type: 'br',
@@ -144,6 +195,10 @@ export class Gui {
                 },
                 // TODO side load mod disable section
                 [this.rId()]: {
+                    section: GM_config.create(StringTable.SectionModDisable),
+                    type: 'br',
+                },
+                [this.rId()]: {
                     section: GM_config.create(StringTable.SectionAddRemove),
                     type: 'br',
                 },
@@ -156,7 +211,7 @@ export class Gui {
                     label: StringTable.AddMod,
                     type: 'button',
                     click: async () => {
-                        this.gui!.fields['AddMod_R'].options = 'Loading...';
+                        this.gui!.fields['AddMod_R'].value = 'Loading...';
                         this.gui!.fields['AddMod_R'].reload();
                         const vv = this.gui!.fields['AddMod_I'].toValue();
                         if (isNil(vv)) {
@@ -374,6 +429,15 @@ export class Gui {
                     // for (i in values) alert(values[i]);
                 },
                 open: (doc) => {
+                    console.log('this.modLoadSwitch.isSafeModeOn()', this.modLoadSwitch.isSafeModeOn());
+                    console.log('this.modLoadSwitch.isSafeModeAutoOn()', this.modLoadSwitch.isSafeModeAutoOn());
+                    this.gui!.fields['SafeModeState_R'].value = (
+                        this.modLoadSwitch.isSafeModeOn() ?
+                            (this.modLoadSwitch.isSafeModeAutoOn() ? StringTable.SafeModeAutoEnabled : StringTable.SafeModeEnabled) :
+                            StringTable.SafeModeDisabled
+                    );
+                    this.gui!.fields['SafeModeState_R'].reload();
+
                     const loadLogNode = this.gui!.fields['LoadLog_r'].node;
                     console.log('loadLogNode', loadLogNode);
                     console.log('loadLogNode', loadLogNode?.parentNode);

@@ -5,6 +5,14 @@ const StringTableKeys = [
     'title',
     'close',
     'reload',
+
+    'EnableSafeMode',
+    'DisableSafeMode',
+    'SafeModeState',
+    'SafeModeEnabled',
+    'SafeModeAutoEnabled',
+    'SafeModeDisabled',
+
     'NowLoadedModeList',
     'NowSideLoadModeList',
     'SelectModZipFile',
@@ -22,7 +30,10 @@ const StringTableKeys = [
     'DownloadExportData2',
 
     'SectionMod',
+    'SectionSafeMode',
+    'SectionLanguageSelect',
     'SectionAddRemove',
+    'SectionModDisable',
     'SectionReadMe',
     'SectionLoadLog',
     'SectionDebug',

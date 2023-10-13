@@ -3,8 +3,8 @@ import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {LifeTimeCircleHook} from "../../../dist-BeforeSC2/ModLoadController";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
 import type JSZip from "jszip";
-import {Sc2EventTracerCallback} from "../../../dist-BeforeSC2/Sc2EventTracer";
-
+import type {Sc2EventTracerCallback} from "../../../dist-BeforeSC2/Sc2EventTracer";
+import {isNil} from 'lodash';
 
 class SafeMode implements Sc2EventTracerCallback {
     constructor(
@@ -15,15 +15,27 @@ class SafeMode implements Sc2EventTracerCallback {
         this.needIntoSafeMode();
     }
 
-    private get safeModeOn() {
-        return !!localStorage.getItem('ModLoadSwitch_safeModeOn');
+    public get safeModeAutoOn() {
+        return !isNil(localStorage.getItem('ModLoadSwitch_safeModeAutoOn'));
     }
 
-    private set safeModeOn(on: boolean) {
+    public get safeModeForceOn() {
+        return !isNil(localStorage.getItem('ModLoadSwitch_safeModeForceOn'));
+    }
+
+    private set safeModeAutoOn(on: boolean) {
         if (on) {
-            localStorage.setItem('ModLoadSwitch_safeModeOn', '1');
+            localStorage.setItem('ModLoadSwitch_safeModeAutoOn', '1');
         } else {
-            localStorage.removeItem('ModLoadSwitch_safeModeOn');
+            localStorage.removeItem('ModLoadSwitch_safeModeAutoOn');
+        }
+    }
+
+    private set safeModeForceOn(on: boolean) {
+        if (on) {
+            localStorage.setItem('ModLoadSwitch_safeModeForceOn', '1');
+        } else {
+            localStorage.removeItem('ModLoadSwitch_safeModeForceOn');
         }
     }
 
@@ -37,34 +49,35 @@ class SafeMode implements Sc2EventTracerCallback {
     }
 
     whenSC2StoryReady() {
-        if (!this.safeModeOn) {
+        if (!this.safeModeAutoOn) {
             this.startBeginCount = 0;
         }
     }
 
     private needIntoSafeMode() {
         if (this.startBeginCount >= 3) {
-            this.safeModeOn = true;
+            this.safeModeAutoOn = true;
         }
         ++this.startBeginCount;
     }
 
     public disableSafeMode() {
-        this.safeModeOn = false;
+        this.safeModeAutoOn = false;
+        this.safeModeForceOn = false;
         this.startBeginCount = 0;
     }
 
     public enableSafeMode() {
-        this.safeModeOn = true;
+        this.safeModeForceOn = true;
     }
 
     public isSafeModeOn() {
-        return this.safeModeOn;
+        return this.safeModeForceOn || this.safeModeAutoOn;
     }
 }
 
 export class ModLoadSwitch implements LifeTimeCircleHook {
-    safeMode: SafeMode;
+    private safeMode: SafeMode;
 
     constructor(
         public gSC2DataManager: SC2DataManager,
@@ -82,8 +95,18 @@ export class ModLoadSwitch implements LifeTimeCircleHook {
         this.safeMode.enableSafeMode();
     }
 
+    public isSafeModeOn() {
+        return this.safeMode.isSafeModeOn();
+    }
+
+    public isSafeModeAutoOn() {
+        return this.safeMode.safeModeAutoOn;
+    }
+
     async canLoadThisMod(bootJson: ModBootJson, zip: JSZip): Promise<boolean> {
+        console.log('ModLoadSwitch.canLoadThisMod()', [bootJson.name]);
         if (this.safeMode.isSafeModeOn()) {
+            console.log('ModLoadSwitch.canLoadThisMod() safeMode is on');
             return false;
         }
         // TODO  check load list
