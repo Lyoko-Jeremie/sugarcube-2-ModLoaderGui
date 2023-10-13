@@ -241,7 +241,7 @@ export class Gui {
                             const m = E?.message || E?.toString() || E;
                             console.error('AddMod_b', E);
                             console.log(`Error: ${m}`);
-                            this.gui!.fields['AddMod_R'].value = `Error: ${this.errorMessage2CN(m)}`;
+                            this.gui!.fields['AddMod_R'].value = `Error: ${StringTable.errorMessage2I18N(m)}`;
                             this.gui!.fields['AddMod_R'].reload();
                         }
                         const l = await this.listSideLoadMod();
@@ -596,29 +596,6 @@ export class Gui {
             // return `Error: ${m}}`
             return Promise.reject(E);
         }
-    }
-
-    errorMessage2CN(s: string) {
-        if (navigator.language !== 'zh-CN') {
-            return s;
-        }
-        if (s.includes('The quota has been exceeded.')) {
-            return 'Zip文件过大，无法存储';
-        }
-        if (s.includes('Encrypted zip are not supported')) {
-            return '无法解密加密的Zip文件';
-        }
-        if (s.includes(`Can't find end of central directory : is this a zip file ? If it is, see`)) {
-            return s.replace(`Can't find end of central directory : is this a zip file ? If it is, see`,
-                `无法找到Zip文件的中央目录：这是一个zip文件吗？如果是，请参阅 `);
-        }
-        if (s.includes(`bootJson Invalid`)) {
-            return 'bootJson无效';
-        }
-        if (/^bootJsonFile .+ Invalid$/.test(s)) {
-            return s.replace(/^bootJsonFile (.+) Invalid$/, `bootJson文件 $1 无效`);
-        }
-        return s;
     }
 
     getModListString() {

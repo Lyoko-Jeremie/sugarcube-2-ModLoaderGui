@@ -38,4 +38,8 @@ export const StringTable_EN: StringTableType = {
     SectionDebug: 'Debug',
 
     NoReadMeString: '<<No ReadMe>>',
+
+    errorMessage2I18N(s: string): string {
+        return s;
+    },
 };
