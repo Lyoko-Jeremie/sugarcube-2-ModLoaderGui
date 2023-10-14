@@ -173,10 +173,10 @@ export class Gui {
                     readonly: true,
                 },
                 // TODO language select section
-                [this.rId()]: {
-                    section: GM_config.create(StringTable.SectionLanguageSelect),
-                    type: 'br',
-                },
+                // [this.rId()]: {
+                //     section: GM_config.create(StringTable.SectionLanguageSelect),
+                //     type: 'br',
+                // },
                 [this.rId()]: {
                     section: GM_config.create(StringTable.SectionMod),
                     type: 'br',
