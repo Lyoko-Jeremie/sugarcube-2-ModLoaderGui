@@ -25,7 +25,7 @@ export const StringTable_EN: StringTableType = {
     ReadMeContent: 'ReadMe',
 
     LoadLog: 'LoadLog',
-    DownloadExportData: 'DownloadExportData',
+    DownloadExportData: 'DownloadExportData (Ctrl+Alt+D)',
     DownloadExportData2: 'DownloadExportData2',
 
     SectionMod: 'ModManage',

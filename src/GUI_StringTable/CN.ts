@@ -25,7 +25,7 @@ export const StringTable_CN: StringTableType = {
     ReadMeContent: 'ReadMe',
 
     LoadLog: '加载日志',
-    DownloadExportData: '导出当前所有数据以检查错误',
+    DownloadExportData: '导出当前所有数据以检查错误 (Ctrl+Alt+D)',
     DownloadExportData2: '导出当前所有数据以检查错误2',
 
     SectionMod: 'Mod管理',
