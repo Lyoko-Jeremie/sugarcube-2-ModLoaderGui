@@ -6,11 +6,12 @@ import type JSZip from "jszip";
 import type {Sc2EventTracerCallback} from "../../../dist-BeforeSC2/Sc2EventTracer";
 import {isNil} from 'lodash';
 
-class SafeMode implements Sc2EventTracerCallback {
+class SafeMode implements Sc2EventTracerCallback, LifeTimeCircleHook {
     constructor(
         public gSC2DataManager: SC2DataManager,
         public gModUtils: ModUtils,
     ) {
+        this.gSC2DataManager.getModLoadController().addLifeTimeCircleHook('ModLoaderGui SafeMode', this);
         this.gSC2DataManager.getSc2EventTracer().addCallback(this);
         this.needIntoSafeMode();
     }
@@ -74,6 +75,15 @@ class SafeMode implements Sc2EventTracerCallback {
     public isSafeModeOn() {
         return this.safeModeForceOn || this.safeModeAutoOn;
     }
+
+    async canLoadThisMod(bootJson: ModBootJson, zip: JSZip): Promise<boolean> {
+        console.log('ModLoadSwitch.canLoadThisMod()', [bootJson.name]);
+        if (this.isSafeModeOn()) {
+            console.log('ModLoadSwitch.canLoadThisMod() safeMode is on');
+            return false;
+        }
+        return true;
+    }
 }
 
 export class ModLoadSwitch implements LifeTimeCircleHook {
@@ -83,8 +93,8 @@ export class ModLoadSwitch implements LifeTimeCircleHook {
         public gSC2DataManager: SC2DataManager,
         public gModUtils: ModUtils,
     ) {
-        this.gSC2DataManager.getModLoadController().addLifeTimeCircleHook('ModLoaderGui ModLoadSwitch', this);
         this.safeMode = new SafeMode(gSC2DataManager, gModUtils);
+        this.gSC2DataManager.getModLoadController().addLifeTimeCircleHook('ModLoaderGui ModLoadSwitch', this);
     }
 
     disableSafeMode() {
@@ -104,11 +114,6 @@ export class ModLoadSwitch implements LifeTimeCircleHook {
     }
 
     async canLoadThisMod(bootJson: ModBootJson, zip: JSZip): Promise<boolean> {
-        console.log('ModLoadSwitch.canLoadThisMod()', [bootJson.name]);
-        if (this.safeMode.isSafeModeOn()) {
-            console.log('ModLoadSwitch.canLoadThisMod() safeMode is on');
-            return false;
-        }
         // TODO  check load list
         return true;
     }
