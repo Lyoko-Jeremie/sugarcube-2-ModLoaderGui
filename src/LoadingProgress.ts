@@ -86,7 +86,32 @@ export class LoadingProgress implements LifeTimeCircleHook {
     }
 
     getLoadLogHtml() {
-        return this.logList.map(T => {
+        const nnn = this.logList.reduce((a, T) => {
+            switch (T.type) {
+                case 'error':
+                    ++a[0];
+                    break;
+                case 'warning':
+                    ++a[1];
+                    break;
+                case 'info':
+                    ++a[2];
+                    break;
+            }
+            return a;
+        }, [0, 0, 0]);
+        const notice: LogItem = {
+            str: `【 ${nnn[0]} error, ${nnn[1]} warning, ${nnn[2]} info 】`,
+            time: moment(),
+        };
+        if (nnn[0] > 0) {
+            notice.type = 'error';
+        } else if (nnn[1] > 0) {
+            notice.type = 'warning';
+        } else {
+            notice.type = 'info';
+        }
+        return [notice].concat(this.logList).map(T => {
             return this.LogItem2Node(T);
         });
     }
