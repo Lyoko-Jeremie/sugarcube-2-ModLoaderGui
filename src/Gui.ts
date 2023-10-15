@@ -194,10 +194,16 @@ export class Gui {
                     readonly: "readonly",
                 },
                 // TODO side load mod disable section
-                [this.rId()]: {
-                    section: GM_config.create(StringTable.SectionModDisable),
-                    type: 'br',
-                },
+                // [this.rId()]: {
+                //     section: GM_config.create(StringTable.SectionModDisable),
+                //     type: 'br',
+                // },
+                // 'NowReadModeList_r': {
+                //     label: StringTable.NowLoadedModeList,
+                //     type: 'textarea',
+                //     default: NowLoadedModeList,
+                //     readonly: "readonly",
+                // },
                 [this.rId()]: {
                     section: GM_config.create(StringTable.SectionAddRemove),
                     type: 'br',
