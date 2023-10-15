@@ -63,15 +63,19 @@ export class DebugExport {
         }
         for (const item of sc.passageDataItems.items) {
             // console.log('passage', [item.name, item.content]);
+            const data = `:: ${item.name}`
+                + `${item.tags.length === 0 ? '' : (' [' + item.tags[0] + ']')}`
+                + `\n${item.content}`;
+            // console.log('passage', [item.name, item.tags, data,]);
             if (!passageDir) {
                 zip.file(
                     `passage/${item.name}.twee`,
-                    `:: ${item.name}\n${item.content}`,
+                    data,
                 );
             } else {
                 zip.file(
                     `passage/${item.name.split(' ')[0]}/${item.name}.twee`,
-                    `:: ${item.name}\n${item.content}`,
+                    data,
                 );
             }
         }
@@ -93,10 +97,13 @@ export class DebugExport {
         const a = document.createElement('a');
         a.href = url;
         a.download = fileName;
+        a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }, 1000);
     }
 
 }
