@@ -563,7 +563,7 @@ export class Gui {
             console.log('f', f);
             if (!(f && f.length === 1)) {
                 console.error('loadAndAddMod() (!(f && f.length === 1))');
-                return Promise.reject(`Error: ${'loadAndAddMod() (!(f && f.length === 1))'}}`);
+                return Promise.reject(`Error: Invalid File`);
             }
             const file = f[0];
             const data = await new Promise((resolve, reject) => {
