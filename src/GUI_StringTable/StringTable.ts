@@ -39,6 +39,8 @@ const StringTableKeys = [
     'SectionDebug',
 
     'NoReadMeString',
+
+    'InvalidFile',
 ] as const;
 
 export type StringTableTypeStringPart = { [key in typeof StringTableKeys[number]]: string; };

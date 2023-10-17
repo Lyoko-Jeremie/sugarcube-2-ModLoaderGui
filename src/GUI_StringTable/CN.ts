@@ -39,6 +39,8 @@ export const StringTable_CN: StringTableType = {
 
     NoReadMeString: '<<没有ReadMe>>',
 
+    InvalidFile: '文件无效',
+
     errorMessage2I18N(s: string): string {
         if (s.includes('The quota has been exceeded.')) {
             return 'Zip文件过大，无法存储';

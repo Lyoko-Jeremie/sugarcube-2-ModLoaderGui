@@ -39,6 +39,8 @@ export const StringTable_EN: StringTableType = {
 
     NoReadMeString: '<<No ReadMe>>',
 
+    InvalidFile: 'Invalid File',
+
     errorMessage2I18N(s: string): string {
         return s;
     },
