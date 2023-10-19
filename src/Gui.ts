@@ -616,19 +616,19 @@ export class Gui {
             const mi = this.gModUtils.getMod(T);
             const rr: string[] = [];
             if (ll && ll.modZipList.has(T)) {
-                rr.push(`[Local] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[Local] ${T} {v:${ll.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (rl && rl.modZipList.has(T)) {
-                rr.push(`[Remote] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[Remote] ${T} {v:${rl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (idl && idl.modZipList.has(T)) {
-                rr.push(`[SideLoad IndexDB] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[SideLoad IndexDB] ${T} {v:${idl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (lsl && lsl.modZipList.has(T)) {
-                rr.push(`[SideLoad LocalStorage] ${T} {v:${mi?.version || '?'}}`);
+                rr.push(`[SideLoad LocalStorage] ${T} {v:${lsl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (rr.length === 1) {
