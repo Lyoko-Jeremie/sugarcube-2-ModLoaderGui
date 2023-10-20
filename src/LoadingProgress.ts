@@ -11,6 +11,12 @@ export interface LogItem {
     type?: 'info' | 'warning' | 'error';
 }
 
+export class LogShowConfig {
+    noInfo: boolean = false;
+    noWarning: boolean = false;
+    noError: boolean = false;
+}
+
 export class LoadingProgress implements LifeTimeCircleHook {
     constructor(
         public gSC2DataManager: SC2DataManager,
@@ -75,17 +81,22 @@ export class LoadingProgress implements LifeTimeCircleHook {
 
     logSubject = new Subject<LogItem>();
 
-    LogItem2Node(T: LogItem) {
+    LogItem2Node(T: LogItem, noTime: boolean = false) {
         const time = T.time.format('HH:mm:ss.SSS');
         const type = T.type;
         const str = T.str;
         const node = document.createElement('div');
         node.style.cssText = `color: ${type === 'error' ? 'red' : type === 'warning' ? 'orange' : 'gray'};`;
-        node.innerText = `${time} ${str}`;
-        return node;
+        if (noTime) {
+            node.innerText = str;
+            return node;
+        } else {
+            node.innerText = `${time} ${str}`;
+            return node;
+        }
     }
 
-    getLoadLogHtml() {
+    getLoadLogHtml(logShowConfig: LogShowConfig = new LogShowConfig()) {
         const nnn = this.logList.reduce((a, T) => {
             switch (T.type) {
                 case 'error':
@@ -111,9 +122,15 @@ export class LoadingProgress implements LifeTimeCircleHook {
         } else {
             notice.type = 'info';
         }
-        return [notice].concat(this.logList).map(T => {
-            return this.LogItem2Node(T);
-        });
+        return [this.LogItem2Node(notice, true)].concat(
+            this.logList.filter(T => {
+                return !((logShowConfig.noInfo && T.type === 'info')
+                    || (logShowConfig.noWarning && T.type === 'warning')
+                    || (logShowConfig.noError && T.type === 'error'));
+            }).map((T, i) => {
+                return this.LogItem2Node(T);
+            }),
+        );
     }
 
     getLoadLog() {

@@ -24,6 +24,11 @@ export const StringTable_CN: StringTableType = {
     ReadMeButton: '查看选定Mod的ReadMe',
     ReadMeContent: 'ReadMe',
 
+    LoadLogRadioNoError: '不显示错误',
+    LoadLogRadioNoWarning: '不显示警告',
+    LoadLogRadioNoInfo: '不显示提示',
+    LoadLogReloadButton: '重新载入日志',
+
     LoadLog: '加载日志',
     DownloadExportData: '导出当前所有数据以检查错误 (Ctrl+Alt+D)',
     DownloadExportData2: '导出当前所有数据以检查错误2',

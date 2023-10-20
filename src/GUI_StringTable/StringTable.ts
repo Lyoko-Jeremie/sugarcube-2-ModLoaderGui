@@ -25,6 +25,11 @@ const StringTableKeys = [
     'ReadMeButton',
     'ReadMeContent',
 
+    'LoadLogRadioNoError',
+    'LoadLogRadioNoWarning',
+    'LoadLogRadioNoInfo',
+    'LoadLogReloadButton',
+
     'LoadLog',
     'DownloadExportData',
     'DownloadExportData2',

@@ -5,7 +5,7 @@ import inlineBootstrap from 'bootstrap/dist/css/bootstrap.css?inlineText';
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
-import {isString, isSafeInteger, isNil, isArray, isEqual} from "lodash";
+import {isString, isSafeInteger, isNil, isArray, isEqual, cloneDeep} from "lodash";
 import moment from "moment";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
@@ -68,9 +68,21 @@ export class Gui {
 
     gui?: GM_configStruct;
 
+    public getStringTable() {
+        return cloneDeep(StringTable);
+    }
+
+    public setStringTable(stringTable: typeof StringTable) {
+        StringTable = stringTable;
+    }
+
     async listSideLoadMod() {
         return await this.gModUtils.getModLoadController().listModIndexDB() || [];
     }
+
+    logShowConfig = {
+        noInfo: false, noWarning: false, noError: false,
+    };
 
     async createGui() {
         if (!this.rootNode) {
@@ -392,10 +404,62 @@ export class Gui {
                     section: GM_config.create(StringTable.SectionLoadLog),
                     type: 'br',
                 },
+                'LoadLog_error_c': {
+                    label: StringTable.LoadLogRadioNoError,
+                    type: 'checkbox',
+                    default: this.logShowConfig.noError,
+                    cssClassName: 'd-inline',
+                    cssStyleText: 'margin-right: 0.5em;',
+                },
+                'LoadLog_warning_c': {
+                    label: StringTable.LoadLogRadioNoWarning,
+                    type: 'checkbox',
+                    default: this.logShowConfig.noWarning,
+                    cssClassName: 'd-inline',
+                    cssStyleText: 'margin-right: 0.5em;',
+                },
+                'LoadLog_info_c': {
+                    label: StringTable.LoadLogRadioNoInfo,
+                    type: 'checkbox',
+                    default: this.logShowConfig.noInfo,
+                    cssClassName: 'd-inline',
+                    cssStyleText: 'margin-right: 0.5em;',
+                },
+                ['LoadLog_reload_b']: {
+                    label: StringTable.LoadLogReloadButton,
+                    type: 'button',
+                    cssClassName: 'd-inline',
+                    xgmExtendField: {bootstrap: {btnType: 'secondary'}},
+                    click: async () => {
+                        console.warn('LoadLog_error_c', [
+                            this.gui!.fields['LoadLog_error_c'].value,
+                            this.gui!.fields['LoadLog_error_c'].node,
+                            (this.gui!.fields['LoadLog_error_c'].node as HTMLInputElement)!.checked,
+                        ]);
+                        this.logShowConfig.noError = !!(this.gui!.fields['LoadLog_error_c'].node as HTMLInputElement)!.checked;
+                        this.logShowConfig.noWarning = !!(this.gui!.fields['LoadLog_warning_c'].node as HTMLInputElement)!.checked;
+                        this.logShowConfig.noInfo = !!(this.gui!.fields['LoadLog_info_c'].node as HTMLInputElement)!.checked;
+
+                        // @ts-ignore
+                        const doc: Document = this.gui!.frame?.contentDocument || this.gui!.frame;
+                        if (!doc) {
+                            console.error('LoadLog_reload_b (!doc) : ', this.gui!.frame);
+                            return;
+                        }
+                        const nId = doc.querySelector('#idLoadLogHtml');
+                        console.log('loadLogNode', nId);
+                        console.log('loadLogNode', nId?.parentNode);
+                        if (nId && nId.parentNode) {
+                            const pn = nId?.parentNode;
+                            pn.removeChild(nId);
+                            pn.appendChild(this.getLoadLogHtml());
+                        }
+                    },
+                },
                 'LoadLog_r': {
                     label: StringTable.LoadLog,
                     type: 'textarea',
-                    default: this.gLoadingProgress.getLoadLog().join('\n'),
+                    // default: this.gLoadingProgress.getLoadLog().join('\n'),
                     readonly: "readonly",
                 },
                 [this.rId()]: {
@@ -450,28 +514,7 @@ export class Gui {
                     if (loadLogNode && loadLogNode.parentNode) {
                         const pn = loadLogNode?.parentNode;
                         pn.removeChild(loadLogNode);
-                        const n = document.createElement('div');
-                        n.style.cssText = 'font-family: "Consolas", monospace;';
-                        const ll = this.gLoadingProgress.getLoadLogHtml();
-                        ll.filter(T => {
-                            switch (T.style.color) {
-                                case 'orange':
-                                    T.style.color = 'whitesmoke';
-                                    T.style.backgroundColor = 'chocolate';
-                                    break;
-                                case 'red':
-                                    T.style.color = 'whitesmoke';
-                                    T.style.backgroundColor = 'firebrick';
-                                    break;
-                                case 'gray':
-                                    T.style.color = 'mistyrose';
-                                    break;
-                                default:
-                                    break;
-                            }
-                        });
-                        n.append(...ll);
-                        pn.appendChild(n);
+                        pn.appendChild(this.getLoadLogHtml());
                     }
                     if (this.isHttpMode) {
                         doc.addEventListener('keydown', async (event) => {
@@ -495,6 +538,32 @@ export class Gui {
                 },
             },
         });
+    }
+
+    private getLoadLogHtml() {
+        const n = document.createElement('div');
+        n.style.cssText = 'font-family: "Consolas", monospace;';
+        n.id = 'idLoadLogHtml';
+        const ll = this.gLoadingProgress.getLoadLogHtml(this.logShowConfig);
+        ll.filter(T => {
+            switch (T.style.color) {
+                case 'orange':
+                    T.style.color = 'whitesmoke';
+                    T.style.backgroundColor = 'chocolate';
+                    break;
+                case 'red':
+                    T.style.color = 'whitesmoke';
+                    T.style.backgroundColor = 'firebrick';
+                    break;
+                case 'gray':
+                    T.style.color = 'mistyrose';
+                    break;
+                default:
+                    break;
+            }
+        });
+        n.append(...ll);
+        return n;
     }
 
 

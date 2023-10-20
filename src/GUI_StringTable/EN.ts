@@ -24,6 +24,11 @@ export const StringTable_EN: StringTableType = {
     ReadMeButton: 'ViewSelectedModReadMe',
     ReadMeContent: 'ReadMe',
 
+    LoadLogRadioNoError: 'NotShowError',
+    LoadLogRadioNoWarning: 'NotShowWarning',
+    LoadLogRadioNoInfo: 'NotShowInfo',
+    LoadLogReloadButton: 'ReloadLog',
+
     LoadLog: 'LoadLog',
     DownloadExportData: 'DownloadExportData (Ctrl+Alt+D)',
     DownloadExportData2: 'DownloadExportData2',
