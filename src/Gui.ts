@@ -650,7 +650,7 @@ export class Gui {
                 const base64 = data.replace(/^data:[^:;]+;base64,/, '');
                 const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFileIndexDB(base64);
                 if (isString(zipFile)) {
-                    return Promise.reject(`Error: ${zipFile}}`);
+                    return Promise.reject(`Error: ${zipFile}`);
                 } else {
                     try {
                         await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, base64);
