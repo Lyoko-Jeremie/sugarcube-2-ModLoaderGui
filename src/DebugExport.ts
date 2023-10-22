@@ -84,6 +84,15 @@ export class DebugExport {
         await this.addonPluginManager.exportDataZip(zip);
         await this.modLoadController.exportDataZip(zip);
 
+        const scriptNodeList = Array.from(this.gSC2DataManager.scriptNode);
+        for (let i = 0; i !== scriptNodeList.length; ++i) {
+            const n = scriptNodeList[i];
+            zip.file(
+                `scriptNode/${i}.js`,
+                n.innerHTML,
+            );
+        }
+
         const blob = await zip.generateAsync({
             type: "blob",
             // compression: "DEFLATE",
