@@ -57,6 +57,16 @@ export class LoadingProgress implements LifeTimeCircleHook {
         this.initOk = true;
 
         this.gSC2DataManager.getModLoadController().addLifeTimeCircleHook('ModLoaderGui LoadingProgress', this);
+        const oldLog = this.gSC2DataManager.getModLoadController().logRecordBeforeAnyLogHookRegister;
+        // console.log('logRecordBeforeAnyLogHookRegister', oldLog);
+        for (const T of oldLog) {
+            this.logList.push({
+                str: T.message,
+                time: moment(T.time),
+                type: T.type,
+            });
+        }
+        // console.log('this.logList', this.logList);
 
         this.logNode = document.createElement('div');
         this.logNode.id = 'LoadingProgressLog';
