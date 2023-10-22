@@ -60,8 +60,8 @@ export const StringTable_CN: StringTableType = {
         if (s.includes(`bootJson Invalid`)) {
             return 'bootJson无效';
         }
-        if (/^bootJsonFile .+ Invalid$/.test(s)) {
-            return s.replace(/^bootJsonFile (.+) Invalid$/, `bootJson文件 $1 无效`);
+        if (/bootJsonFile .+ Invalid/.test(s)) {
+            return s.replace(/bootJsonFile (.+) Invalid/, `bootJson文件 [$1] 无效`);
         }
         return s;
     },
