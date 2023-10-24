@@ -5,12 +5,12 @@ import inlineBootstrap from 'bootstrap/dist/css/bootstrap.css?inlineText';
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
+import type {LogWrapper} from '../../../dist-BeforeSC2/ModLoadController';
 import {isString, isSafeInteger, isNil, isArray, isEqual, cloneDeep} from "lodash";
 import moment from "moment";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
 import {DebugExport} from "./DebugExport";
-import {ModZipReader} from '../../../dist-BeforeSC2/ModZipReader';
 import {getStringTable} from './GUI_StringTable/StringTable';
 import {ModLoadSwitch} from "./ModLoadSwitch";
 
@@ -37,6 +37,8 @@ export class Gui {
 
     modLoadSwitch: ModLoadSwitch;
 
+    logger: LogWrapper;
+
     constructor(
         public gSC2DataManager: SC2DataManager,
         public gModUtils: ModUtils,
@@ -44,6 +46,7 @@ export class Gui {
         public gPassageTracer: PassageTracer,
         public thisWin: Window,
     ) {
+        this.logger = gModUtils.getLogger();
         this.init();
         this.gPassageTracer.addCallback((passageName) => {
             if (this.startBanner) {
@@ -674,11 +677,13 @@ export class Gui {
     }
 
     getModListString() {
+        // TODO re-calc mod load list use read list and loaded list
         const l = this.gModUtils.getModListName();
         const ll = this.gSC2DataManager.getModLoader().getLocalLoader();
         const rl = this.gSC2DataManager.getModLoader().getRemoteLoader();
         const lsl = this.gSC2DataManager.getModLoader().getLocalStorageLoader();
         const idl = this.gSC2DataManager.getModLoader().getIndexDBLoader();
+        const lal = this.gSC2DataManager.getModLoader().getLazyLoader();
         const r: string[] = [];
         for (const T of l) {
             let f = false;
@@ -733,21 +738,17 @@ export class Gui {
         const readme = additionFile.find(T => T.toLowerCase().startsWith('readme'));
         if (!readme) {
             console.error('getModTReadMe() (!readme)', name);
+            this.logger.error(`getModTReadMe() (!zip) [${name}]`);
             return StringTable.NoReadMeString;
         }
-        const modZips = this.gModUtils.getModZip(name);
-        if (!modZips || modZips.length === 0) {
-            // never go there
-            console.error('getModTReadMe() (!modZips || modZips.length === 0)', name);
-            return StringTable.NoReadMeString;
-        }
-        const zip = modZips.find((T: ModZipReader) => isEqual(T.getModInfo()?.bootJson, mod.bootJson));
+        const zip = this.gModUtils.getModZip(name);
         if (!zip) {
             // never go there
-            console.error('getModTReadMe() (!zip)', [name, modZips, mod]);
+            console.error('getModTReadMe() (!zip)', [name, mod]);
+            this.logger.error(`getModTReadMe() (!zip) [${name}]`);
             return StringTable.NoReadMeString;
         }
-        const readmeFile = zip.getZipFile().file(readme);
+        const readmeFile = zip.zip.file(readme);
         // console.log('readmeFile', readmeFile?.async('string'));
         return await readmeFile?.async('string') || StringTable.NoReadMeString;
     }
@@ -755,7 +756,8 @@ export class Gui {
     async getModTJson(name: string) {
         const mod = this.gModUtils.getMod(name);
         if (!mod) {
-            console.error('getModTReadMe() (!mod)', name);
+            console.error('getModTJson() (!mod)', name);
+            this.logger.error(`getModTJson() (!zip) [${name}]`);
             return StringTable.NoReadMeString;
         }
         return JSON.stringify(mod.bootJson, undefined, 2);
