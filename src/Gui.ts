@@ -705,6 +705,10 @@ export class Gui {
                 rr.push(`[SideLoad LocalStorage] ${T} {v:${lsl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
+            if (lal && lal.modZipList.has(T)) {
+                rr.push(`[SideLoadLazy] ${T} {v:${lal.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                f = true;
+            }
             if (rr.length === 1) {
                 r.push(...rr);
             } else {
