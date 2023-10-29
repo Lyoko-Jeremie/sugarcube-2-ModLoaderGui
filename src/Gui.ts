@@ -94,7 +94,8 @@ export class Gui {
             this.rootNode.style.cssText = 'z-index: 1002;';
             document.body.appendChild(this.rootNode);
         }
-        const NowLoadedModeList = this.getModListString().join('\n');
+        const NowLoadedModeList = `ModLoader ${`{v:${this.gModUtils.version}}` || ''}\n`
+            + this.getModListString().join('\n');
         const l = await this.listSideLoadMod();
         const NowSideLoadModeList: string = l.join('\n');
         console.log('NowLoadedModeList', NowLoadedModeList);
@@ -117,7 +118,7 @@ export class Gui {
                 },
             },
             'id': 'MyConfig',
-            'title': StringTable.title + (this.gModUtils.version || ''),
+            'title': StringTable.title + ((' v' + this.gModUtils.version) || ''),
             css: inlineGMCss + '\n' + (this.isHttpMode ? inlineBootstrap : divModCss),
             'frame': (this.isHttpMode ? undefined : this.rootNode),
             'fields': {
