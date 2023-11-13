@@ -581,7 +581,7 @@ export class Gui {
         this.initOk = true;
 
         this.thisWin.addEventListener('keydown', async (event) => {
-            console.log('keydown', event);
+            // console.log('keydown', event);
             if (event.altKey && (event.key === 'M' || event.key === 'm')) {
                 if (event.shiftKey) {
                     if (this.gui && this.gui.isOpen) {
