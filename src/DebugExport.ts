@@ -93,6 +93,11 @@ export class DebugExport {
             );
         }
 
+        zip.file(
+            `ModLoaderLog.txt`,
+            this.gLoadingProgress.getLoadLog().join('\n'),
+        );
+
         const blob = await zip.generateAsync({
             type: "blob",
             // compression: "DEFLATE",

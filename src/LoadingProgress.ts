@@ -145,7 +145,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
 
     getLoadLog() {
         return this.logList.map(T => {
-            return `${T.time.format('HH:mm:ss.SSS')} ${T.str}`;
+            return `[${T.time.format('HH:mm:ss.SSS')}][${T.type}] ${T.str}`;
         });
     }
 
