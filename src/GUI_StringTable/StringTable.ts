@@ -55,6 +55,10 @@ export interface StringTableType extends StringTableTypeStringPart {
 }
 
 export function getStringTable(): StringTableType {
+    // zh, zh-CN, zh-TW
+    if (navigator.language.startsWith('zh')) {
+        return StringTable_CN;
+    }
     switch (navigator.language) {
         case 'zh-CN':
             return StringTable_CN;
