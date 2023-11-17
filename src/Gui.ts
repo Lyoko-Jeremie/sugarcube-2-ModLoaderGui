@@ -11,12 +11,18 @@ import moment from "moment";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
 import {DebugExport} from "./DebugExport";
-import {getStringTable} from './GUI_StringTable/StringTable';
+import {getStringTable, StringTableType} from './GUI_StringTable/StringTable';
 import {ModLoadSwitch} from "./ModLoadSwitch";
 
 const btnType: BootstrapBtnType = 'secondary';
 
-let StringTable = getStringTable();
+// const StringTable = getStringTable();
+const StringTable: StringTableType = new Proxy({}, {
+    get: function (obj, prop: keyof StringTableType) {
+        const s = getStringTable();
+        return s[prop];
+    },
+}) as StringTableType;
 
 const divModCss = `
 #MyConfig_wrapper {
@@ -71,13 +77,13 @@ export class Gui {
 
     gui?: GM_configStruct;
 
-    public getStringTable() {
-        return cloneDeep(StringTable);
-    }
-
-    public setStringTable(stringTable: typeof StringTable) {
-        StringTable = stringTable;
-    }
+    // public getStringTable() {
+    //     return cloneDeep(StringTable);
+    // }
+    //
+    // public setStringTable(stringTable: typeof StringTable) {
+    //     StringTable = stringTable;
+    // }
 
     async listSideLoadMod() {
         return await this.gModUtils.getModLoadController().listModIndexDB() || [];
