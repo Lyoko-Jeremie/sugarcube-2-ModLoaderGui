@@ -31,13 +31,14 @@ export class LoadingProgress implements LifeTimeCircleHook {
             bufferTime(100),
         ).subscribe({
             next: (T) => {
-                // if (this.logNode) {
-                //     this.logNode.append(...T);
-                // }
                 if (this.logNode) {
-                    this.logNode.innerHTML = '';
-                    this.logNode.append(...this.getLoadLogHtml());
+                    // use append mode
+                    this.logNode.append(...T);
                 }
+                // if (this.logNode) {
+                //     this.logNode.innerHTML = '';
+                //     this.logNode.append(...this.getLoadLogHtml());
+                // }
             },
             error: (e) => {
                 console.error('LoadingProgress logSubject error', e);
