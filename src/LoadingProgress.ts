@@ -123,7 +123,7 @@ export class LoadingProgress implements LifeTimeCircleHook {
             return a;
         }, [0, 0, 0]);
         const notice: LogItem = {
-            str: `【 ${nnn[0]} error, ${nnn[1]} warning, ${nnn[2]} info 】`,
+            str: `【 ${nnn[0]} error, ${nnn[1]} warning, ${nnn[2]} info 】【${this.gModUtils.version}】`,
             time: moment(),
         };
         if (nnn[0] > 0) {
