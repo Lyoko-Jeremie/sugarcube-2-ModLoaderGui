@@ -1,5 +1,6 @@
 import type {AddonPluginManager} from "../../../dist-BeforeSC2/AddonPlugin";
-import {ModLoadController} from "../../../dist-BeforeSC2/ModLoadController";
+import type {ModLoadController} from "../../../dist-BeforeSC2/ModLoadController";
+import type {ModOrderItem} from "../../../dist-BeforeSC2/ModOrderContainer";
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {LoadingProgress} from "./LoadingProgress";
@@ -93,6 +94,11 @@ export class DebugExport {
             );
         }
 
+        const modList = this.gSC2DataManager.getModLoader().getModReadCache().get_Array();
+        for (const mod of modList) {
+            await this.exportMod(zip, mod);
+        }
+
         zip.file(
             `ModLoaderLog.txt`,
             this.gLoadingProgress.getLoadLog().join('\n'),
@@ -104,6 +110,24 @@ export class DebugExport {
             // compressionOptions: {level: 0},
         });
         return blob;
+    }
+
+    async exportMod(zip: JSZip, mod: ModOrderItem) {
+        const prefix = 'ExportLoadedModScript';
+        // mod.mod.bootJson;
+        // mod.mod.scriptFileList_preload;
+        // mod.mod.scriptFileList_inject_early;
+        // mod.mod.scriptFileList_earlyload;
+        zip.file(`${prefix}/${mod.mod.name}/boot.json`, JSON.stringify(mod.mod.bootJson, undefined, 2));
+        for (const item of mod.mod.scriptFileList_preload) {
+            zip.file(`${prefix}/${mod.mod.name}/scriptFileList_preload/${item[0]}`, item[1]);
+        }
+        for (const item of mod.mod.scriptFileList_inject_early) {
+            zip.file(`${prefix}/${mod.mod.name}/scriptFileList_inject_early/${item[0]}`, item[1]);
+        }
+        for (const item of mod.mod.scriptFileList_earlyload) {
+            zip.file(`${prefix}/${mod.mod.name}/scriptFileList_earlyload/${item[0]}`, item[1]);
+        }
     }
 
     createDownload(blob: Blob, fileName: string) {
