@@ -1,4 +1,4 @@
-import {GM_config, Field, InitOptionsNoCustom, GM_configStruct, BootstrapBtnType} from './GM_config_TS/gm_config';
+import {BootstrapBtnType, GM_config, GM_configStruct} from './GM_config_TS/gm_config';
 import inlineGMCss from './GM.css?inlineText';
 import inlineBootstrap from 'bootstrap/dist/css/bootstrap.css?inlineText';
 
@@ -6,13 +6,14 @@ import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
 import type {LogWrapper} from '../../../dist-BeforeSC2/ModLoadController';
-import {isString, isSafeInteger, isNil, isArray, isEqual, cloneDeep} from "lodash";
+import {isArray, isNil, isString} from "lodash";
 import moment from "moment";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
 import {DebugExport} from "./DebugExport";
 import {getStringTable, StringTableType} from './GUI_StringTable/StringTable';
 import {ModLoadSwitch} from "./ModLoadSwitch";
+import {DependencyHelper} from "./DependencyHelper";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -328,6 +329,9 @@ export class Gui {
                             return;
                         }
                         await this.gModUtils.getModLoadController().removeModIndexDB(vv);
+                        if (window.dependencyHelper){
+                            window.dependencyHelper.RemoveMod(vv);
+                        }
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
 
                         const l = await this.listSideLoadMod();
@@ -636,6 +640,43 @@ export class Gui {
 
     startBanner?: HTMLDivElement;
 
+    static async fetchAndEncode(url: string): Promise<string> {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+        const binary = bytes.reduce((acc, byte) => acc + String.fromCharCode(byte), "");
+        return window.btoa(binary);
+    }
+
+    async loadAndAddModFromUrl(downloadDir: string): Promise<void> {
+        const content = await Gui.fetchAndEncode(downloadDir);
+        const zipFile: ModBootJson | string =
+            await this.gModUtils.getModLoadController().checkModZipFileIndexDB(content);
+        if (isString(zipFile)) {
+            return Promise.reject(`Error: ${zipFile}`);
+        } else {
+            try {
+                await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, content);
+            } catch (e) {
+                console.error(e);
+                try {
+                    this.gModUtils.getModLoadController().addModLocalStorage(zipFile.name, content);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+        }
+        if (!window.dependencyHelper){
+            window.dependencyHelper = new DependencyHelper(window.modSC2DataManager, window.modUtils);
+        }
+        let unresolvedDependencies =
+            await window.dependencyHelper.AddModAndResolveDependency(zipFile, this.loadAndAddModFromUrl);
+        if (unresolvedDependencies.length > 0)
+        {
+            this.logger.log(`loaded mod ${zipFile.name}, unresolved dependencies: ${unresolvedDependencies.join(',')}`);
+        }
+    }
+
     async loadAndAddMod(htmlFile: HTMLInputElement) {
         try {
             const f = htmlFile.files;
@@ -671,6 +712,16 @@ export class Gui {
                         } catch (e) {
                             console.error(e);
                         }
+                    }
+                    //tryResolveDependency
+                    if (!window.dependencyHelper){
+                        window.dependencyHelper = new DependencyHelper(window.modSC2DataManager, window.modUtils);
+                    }
+                    let unresolvedDependency = await
+                        window.dependencyHelper.AddModAndResolveDependency(zipFile, this.loadAndAddModFromUrl);
+                    if (unresolvedDependency.length > 0)
+                    {
+                        return `Success. Reload the page to take effect, but some dependent mods have not yet been met:${unresolvedDependency.join(',')}`;
                     }
                 }
             }
