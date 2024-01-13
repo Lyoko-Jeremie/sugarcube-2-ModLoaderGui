@@ -258,7 +258,7 @@ export class Gui {
                         try {
                             const R = await this.loadAndAddMod((vv as any));
                             // this.gui!.fields['AddMod_R'].value = `Success. reload page to take effect`;
-                            this.gui!.fields['AddMod_R'].value = `Success. 刷新页面后生效`;
+                            this.gui!.fields['AddMod_R'].value = R;
                             this.gui!.fields['AddMod_R'].reload();
                             // console.log('this.gModUtils.getModLoadController().listModLocalStorage()', this.gModUtils.getModLoadController().listModLocalStorage());
                             // const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
@@ -669,11 +669,11 @@ export class Gui {
         if (!window.dependencyHelper){
             window.dependencyHelper = new DependencyHelper(window.modSC2DataManager, window.modUtils);
         }
-        let unresolvedDependencies =
-            await window.dependencyHelper.AddModAndResolveDependency(zipFile, this.loadAndAddModFromUrl);
-        if (unresolvedDependencies.length > 0)
+        let result =
+            await window.dependencyHelper.AddModAndResolveDependency(zipFile, this.loadAndAddModFromUrl.bind(this));
+        if (result.unresolved.length > 0)
         {
-            this.logger.log(`loaded mod ${zipFile.name}, unresolved dependencies: ${unresolvedDependencies.join(',')}`);
+            this.logger.log(`loaded mod ${zipFile.name}, unresolved dependencies: ${result.unresolved.join(',')}`);
         }
     }
 
@@ -717,15 +717,19 @@ export class Gui {
                     if (!window.dependencyHelper){
                         window.dependencyHelper = new DependencyHelper(window.modSC2DataManager, window.modUtils);
                     }
-                    let unresolvedDependency = await
-                        window.dependencyHelper.AddModAndResolveDependency(zipFile, this.loadAndAddModFromUrl);
-                    if (unresolvedDependency.length > 0)
+                    let result = await
+                        window.dependencyHelper.AddModAndResolveDependency(zipFile, this.loadAndAddModFromUrl.bind(this));
+                    if (result.unresolved.length > 0)
                     {
-                        return `Success. Reload the page to take effect, but some dependent mods have not yet been met:${unresolvedDependency.join(',')}`;
+                        return `Success. Reload the page to take effect, but some dependent mods have not yet been met:${result.unresolved.join(',')}, installed dependencies:${result.installed.join(',')}`;
+                    }
+                    else if(result.installed.length > 0)
+                    {
+                        return `Success. Reload the page to take effect, installed dependencies:${result.installed.join(',')}`;
                     }
                 }
             }
-            return `Success. reload page to take effect`;
+            return `Success. 刷新页面后生效`;
         } catch (E: any) {
             console.error('loadAndAddMod', E);
             const m = E?.message || E?.toString() || E;

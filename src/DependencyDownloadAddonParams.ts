@@ -23,9 +23,9 @@ export function checkdownloadDirObject(c: any) : c is downloadDir {
         ;
 }
 
-export function checkAddrObject(c: any) : c is DependencyDownloadParams {
+export function checkAddrArray(c: any) : c is downloadDir[] {
     return isObject(c)
-        && isArray(get(c, 'addr')) && every(get(c, 'addr'), checkdownloadDirObject);
+        && isArray(c) && every(c, checkdownloadDirObject);
 }
 
 

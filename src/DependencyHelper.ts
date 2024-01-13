@@ -4,7 +4,7 @@ import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson, ModBootJsonAddonPlugin} from "../../../dist-BeforeSC2/ModLoader";
 import type {LogWrapper} from '../../../dist-BeforeSC2/ModLoadController';
 import type {ModOrderItem} from '../../../dist-BeforeSC2/ModOrderContainer';
-import {checkAddrObject, downloadDir} from "./DependencyDownloadAddonParams";
+import {checkAddrArray, downloadDir} from "./DependencyDownloadAddonParams";
 
 
 
@@ -17,6 +17,7 @@ export class DependencyHelper
     isInProgress: boolean;
     unresolvedMods: string[];
     downloadedMods: string[];
+    installedMods: string[];
 
 
     constructor(
@@ -27,8 +28,11 @@ export class DependencyHelper
         this.downloadAddressMap = new Map();
         this.installedModMap = new Map();
         this.isInProgress = false;
+        //下面的变量是成员变量的理由是，这些内容会在递归时进行更新。
         this.unresolvedMods = [];
         this.downloadedMods = [];
+        this.installedMods = [];
+
 
         this.InitDownloadAddressMap(gSC2DataManager.getModLoader().getModCacheArray());
     }
@@ -44,10 +48,13 @@ export class DependencyHelper
         const pp = bootJson.addonPlugin?.find((T: ModBootJsonAddonPlugin) => {
             return T.addonName === 'DependenceDownloadAddon';
         })?.params;
-        if (!checkAddrObject(pp)) {
-            console.error('[DependencyHelper] AddMod() ParamsInvalid', [bootJson.name, pp]);
-            this.logger.error(`[DependencyHelper] AddMod() ParamsInvalid: addon[${bootJson.name}]`);
-            return false;
+        if(pp !== undefined) {
+            if (!checkAddrArray(pp)) {
+                console.error('[DependencyHelper] AddMod() ParamsInvalid', [bootJson.name, pp]);
+                this.logger.error(`[DependencyHelper] AddMod() ParamsInvalid: addon[${bootJson.name}]`);
+                return false;
+            }
+            downloadDirList = pp;
         }
         this.downloadAddressMap.set(bootJson.name, downloadDirList);
         this.installedModMap.set(bootJson.name, bootJson);
@@ -79,16 +86,17 @@ export class DependencyHelper
      * @returns 没有满足的依赖 Mod 列表
      */
     checkDependency(modJson: ModBootJson): string[]{
-        let unresolvedMods: string[] = [];
+        let currentUnresolvedMods: string[] = [];
         if (modJson.dependenceInfo) {
             for (const dep of modJson.dependenceInfo) {
                 if (!this.installedModMap.has(dep.modName))
                 {
-                    unresolvedMods.push(dep.modName);
+                    if(dep.modName === "ModLoader") continue;
+                    currentUnresolvedMods.push(dep.modName);
                 }
             }
         }
-        return unresolvedMods;
+        return currentUnresolvedMods;
     }
 
     /**
@@ -100,7 +108,7 @@ export class DependencyHelper
      * @returns {Promise<string[]>} - 返回没有被成功处理的依赖项
      */
     public async AddModAndResolveDependency(modJson: ModBootJson,
-                                            downloadModCallback: (param: string) => Promise<void>) : Promise<string[]>{
+                                            downloadModCallback: (param: string) => Promise<void>) : Promise<{ installed: string[], unresolved: string[] }>{
         let isOuterCaller: boolean = false;
         if (!this.isInProgress)
         {
@@ -109,13 +117,14 @@ export class DependencyHelper
             this.isInProgress = true;
             this.unresolvedMods.length = 0;
             this.downloadedMods.length = 0;
+            this.installedMods.length = 0;
             isOuterCaller = true;
         }
         this.AddMod(modJson);
 
-        const unresolvedMods = this.checkDependency(modJson);
-        if (unresolvedMods.length > 0) {
-            for (const modName of unresolvedMods) {
+        const currentUnresolvedMods = this.checkDependency(modJson);
+        if (currentUnresolvedMods.length > 0) {
+            for (const modName of currentUnresolvedMods) {
                 let downloadDir: string = "";
                 try {
                     //此处允许失败
@@ -132,8 +141,9 @@ export class DependencyHelper
                         if (found)
                             break;
                     }
-                    if (found) {
+                    if (found) {//这个callback 只要不产生异常，就认为是成功的
                         await downloadModCallback(downloadDir);
+                        this.installedMods.push(modName);
                     }
                 } catch (error) {
                     console.error('[DependencyHelper] AddModAndResolveDependency() Failed to download mod:', [error, downloadDir]);
@@ -146,7 +156,9 @@ export class DependencyHelper
         {
             for (const element of resolveFailMods)
             {
-                unresolvedMods.push(element);
+                if (!this.unresolvedMods.includes(element)) {
+                    this.unresolvedMods.push(element);
+                }
             }
         }
         if (isOuterCaller)
@@ -157,7 +169,8 @@ export class DependencyHelper
         {
             this.downloadedMods.push(modJson.name);
         }
-        return unresolvedMods;
+        //进行一个深复制，避免外部修改这些内部状态
+        return {unresolved:this.unresolvedMods.slice(), installed: this.installedMods.slice()};
     }
 
     InitDownloadAddressMap(arr: ModOrderItem[]) {
