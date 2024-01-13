@@ -1,0 +1,63 @@
+{
+  "name": "DepModB",
+  "version": "1.2.0",
+  "styleFileList": [
+  ],
+  "scriptFileList_earlyload": [
+  ],
+  "scriptFileList_inject_early": [
+  ],
+  "scriptFileList_preload": [
+  ],
+  "scriptFileList": [
+  ],
+  "tweeFileList": [
+  ],
+  "imgFileList": [
+  ],
+  "additionFile": [
+  ],
+  "addonPlugin": [
+
+    {
+      "modName": "ModLoader DoL ImageLoaderHook",
+      "addonName": "ImageLoaderAddon",
+      "modVersion": ">=1.0.0",
+      "params": [
+      ]
+    },
+    {
+      "modName": "DependenceDownloadAddon",
+      "addonName": "DependenceDownloadAddon",
+      "modVersion": "1.0.0",
+      "params": [
+        {
+          "modName": "DepModC",
+          "downloadDir": "https://magicalastrogy.site/DepModC.mod.zip"
+        }
+      ]
+    }
+  ],
+  "dependenceInfo": [
+    {
+      "modName": "ModLoader",
+      "version": ">=1.1.0"
+    },
+    {
+      "modName": "ModLoader DoL ImageLoaderHook",
+      "version": ">=1.0.0"
+    },
+    {
+      "modName": "TweeReplacer",
+      "version": ">=1.0.0"
+    },
+    {
+      "modName": "ReplacePatcher",
+      "version": ">=1.0.0"
+    },
+    {
+      "modName": "DepModC",
+      "version": ">=1.0.0"
+    }
+  ]
+}
