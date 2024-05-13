@@ -21,7 +21,7 @@ export class DebugExport {
     }
 
     async exportData(passageDir = false) {
-        const zip = new JSZip();
+        let zip = new JSZip();
 
         this.gSC2DataManager.flushAfterPatchCache();
         const sc = this.gSC2DataManager.getSC2DataInfoAfterPatch();
@@ -82,8 +82,8 @@ export class DebugExport {
         }
         this.gSC2DataManager.flushAfterPatchCache();
 
-        await this.addonPluginManager.exportDataZip(zip);
-        await this.modLoadController.exportDataZip(zip);
+        zip = await this.addonPluginManager.exportDataZip(zip);
+        zip = await this.modLoadController.exportDataZip(zip);
 
         const scriptNodeList = Array.from(this.gSC2DataManager.scriptNode);
         for (let i = 0; i !== scriptNodeList.length; ++i) {
