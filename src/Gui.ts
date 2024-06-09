@@ -774,5 +774,9 @@ export class Gui {
         return JSON.stringify(mod.bootJson, undefined, 2);
     }
 
+    patchVersionString() {
+        StartConfig.version = `${StartConfig.version}-(ML${('-v' + this.gModUtils.version || '')})`;
+    }
+
 }
 
