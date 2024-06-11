@@ -775,7 +775,8 @@ export class Gui {
     }
 
     patchVersionString() {
-        StartConfig.version = `${StartConfig.version}-(ML${('-v' + this.gModUtils.version || '')})`;
+        // StartConfig.version = `${StartConfig.version}-(ML${('-v' + this.gModUtils.version || '')})`;
+        StartConfig.versionName = `${StartConfig.versionName}-(ML${('-v' + this.gModUtils.version || '')})`;
     }
 
 }
