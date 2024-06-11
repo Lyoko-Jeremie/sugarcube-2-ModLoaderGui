@@ -776,6 +776,7 @@ export class Gui {
 
     patchVersionString() {
         // StartConfig.version = `${StartConfig.version}-(ML${('-v' + this.gModUtils.version || '')})`;
+        // @ts-ignore
         StartConfig.versionName = `${StartConfig.versionName}-(ML${('-v' + this.gModUtils.version || '')})`;
     }
 

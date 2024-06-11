@@ -14,5 +14,5 @@ declare global {
         jQuery: jQuery;
     }
 
-    var StartConfig: any
+    var StartConfig: any;
 }
