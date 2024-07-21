@@ -13,6 +13,7 @@ import {PassageTracer} from "./PassageTracer";
 import {DebugExport} from "./DebugExport";
 import {getStringTable, StringTableType} from './GUI_StringTable/StringTable';
 import {ModLoadSwitch} from "./ModLoadSwitch";
+import {KeyFilter} from "./KeyFilter";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -529,7 +530,7 @@ export class Gui {
                     if (this.isHttpMode) {
                         doc.addEventListener('keydown', async (event) => {
                             // console.log('keydown', event);
-                            if (event.altKey && (event.key === 'M' || event.key === 'm')) {
+                            if (KeyFilter.open(event)) {
                                 if (event.shiftKey) {
                                     if (this.gui && this.gui.isOpen) {
                                         this.gui.close();
@@ -588,7 +589,7 @@ export class Gui {
 
         this.thisWin.addEventListener('keydown', async (event) => {
             // console.log('keydown', event);
-            if (event.altKey && (event.key === 'M' || event.key === 'm')) {
+            if (KeyFilter.open(event)) {
                 if (event.shiftKey) {
                     if (this.gui && this.gui.isOpen) {
                         this.gui.close();
@@ -606,7 +607,7 @@ export class Gui {
         });
 
         this.thisWin.addEventListener('keydown', async (event) => {
-            if (event.altKey && event.ctrlKey && (event.key === 'D' || event.key === 'd')) {
+            if (KeyFilter.exportData(event)) {
                 this.debugExport.createDownload(
                     await this.debugExport.exportData(),
                     `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
