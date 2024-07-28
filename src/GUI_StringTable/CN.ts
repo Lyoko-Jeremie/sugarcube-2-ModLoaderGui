@@ -49,12 +49,12 @@ export const StringTable_CN: StringTableType = {
 
     // used for ModSubUiAngularJsService.ts
 
-    MoveEnabledSelectedItemUp: '上移选择的已启用Mod',
-    MoveEnabledSelectedItemDown: '下移选择的已启用Mod',
-    EnableSelectedItem: '启用选择的Mod',
-    DisableSelectedItem: '禁用选择的Mod',
-    MoveDisabledSelectedItemUp: '上移选择的已禁用Mod',
-    MoveDisabledSelectedItemDown: '下移选择的已禁用Mod',
+    MoveEnabledSelectedItemUp: '上移选中的已启用Mod',
+    MoveEnabledSelectedItemDown: '下移选中的已启用Mod',
+    EnableSelectedItem: '启用选中的Mod',
+    DisableSelectedItem: '禁用选中的Mod',
+    MoveDisabledSelectedItemUp: '上移选中的已禁用Mod',
+    MoveDisabledSelectedItemDown: '下移选中的已禁用Mod',
 
 
     errorMessage2I18N(s: string): string {

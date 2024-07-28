@@ -1,5 +1,13 @@
 import {ModUtils} from "../../../dist-BeforeSC2/Utils";
+import {getStringTable, StringTableType} from "./GUI_StringTable/StringTable";
 
+// const StringTable = getStringTable();
+const StringTable: StringTableType = new Proxy({}, {
+    get: function (obj, prop: keyof StringTableType) {
+        const s = getStringTable();
+        return s[prop];
+    },
+}) as StringTableType;
 
 export class ModSubUiAngularJsService {
 
@@ -94,11 +102,13 @@ export class ModSubUiAngularJsService {
                 },
                 noHrSplit: true,
                 buttonClass: 'btn btn-sm btn-secondary',
-                text:{
-                    MoveSelectedItemUp: 'Move Up',
-                    MoveSelectedItemDown: 'Move Down',
-                    MoveEnabledSelectedItemUp: 'Move Up EnabledItem',
-                    MoveEnabledSelectedItemDown: 'Move Down EnabledItem',
+                text: {
+                    MoveEnabledSelectedItemUp: StringTable.MoveEnabledSelectedItemUp,
+                    MoveEnabledSelectedItemDown: StringTable.MoveEnabledSelectedItemDown,
+                    EnableSelectedItem: StringTable.EnableSelectedItem,
+                    DisableSelectedItem: StringTable.DisableSelectedItem,
+                    MoveDisabledSelectedItemUp: StringTable.MoveDisabledSelectedItemUp,
+                    MoveDisabledSelectedItemDown: StringTable.MoveDisabledSelectedItemDown,
                 }
             },
         });
