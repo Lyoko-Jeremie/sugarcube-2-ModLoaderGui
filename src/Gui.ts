@@ -88,10 +88,6 @@ export class Gui {
     //     StringTable = stringTable;
     // }
 
-    async listSideLoadMod() {
-        return await this.gModUtils.getModLoadController().listModIndexDB() || [];
-    }
-
     logShowConfig = {
         noInfo: false, noWarning: false, noError: false,
     };
@@ -705,6 +701,23 @@ export class Gui {
         }
     }
 
+    async listSideLoadMod() {
+        const nameList = await this.gModUtils.getModLoadController().listModIndexDB() || [];
+        const idl = this.gSC2DataManager.getModLoader().getIndexDBLoader();
+        const modNameVersionList = [];
+        if (idl) {
+            for (const T of nameList) {
+                const mod = idl.modZipList.get(T);
+                if (mod) {
+                    modNameVersionList.push(`${T} {v:${mod[0].modInfo?.version || '?'}}`);
+                } else {
+                    modNameVersionList.push(`${T} {v:?}`);
+                }
+            }
+        }
+        return modNameVersionList;
+    }
+
     getModListString() {
         // TODO re-calc mod load list use read list and loaded list
         const l = this.gModUtils.getModListName();
@@ -742,7 +755,7 @@ export class Gui {
                 r.push(...rr);
             } else {
                 for (let i = 0; i < rr.length - 1; i++) {
-                    r.push('[Overwritten]' + rr[i]);
+                    r.push(rr[i] + ' [  Overwritten  ]');
                 }
                 r.push(rr[rr.length - 1]);
             }
