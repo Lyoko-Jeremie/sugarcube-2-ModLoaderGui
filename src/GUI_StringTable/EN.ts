@@ -47,6 +47,16 @@ export const StringTable_EN: StringTableType = {
 
     InvalidFile: 'Invalid File',
 
+    // used for ModSubUiAngularJsService.ts
+
+    MoveEnabledSelectedItemUp: 'Move Selected Enabled Mod Up',
+    MoveEnabledSelectedItemDown: 'Move Selected Enabled Mod Down',
+    EnableSelectedItem: 'Enable Selected Mod',
+    DisableSelectedItem: 'Disable Selected Mod',
+    MoveDisabledSelectedItemUp: 'Move Selected Disabled Mod Up',
+    MoveDisabledSelectedItemDown: 'Move Selected Disabled Mod Down',
+
+
     errorMessage2I18N(s: string): string {
         return s;
     },

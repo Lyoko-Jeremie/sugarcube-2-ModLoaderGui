@@ -47,6 +47,16 @@ export const StringTable_CN: StringTableType = {
 
     InvalidFile: '文件无效',
 
+    // used for ModSubUiAngularJsService.ts
+
+    MoveEnabledSelectedItemUp: '上移选择的已启用Mod',
+    MoveEnabledSelectedItemDown: '下移选择的已启用Mod',
+    EnableSelectedItem: '启用选择的Mod',
+    DisableSelectedItem: '禁用选择的Mod',
+    MoveDisabledSelectedItemUp: '上移选择的已禁用Mod',
+    MoveDisabledSelectedItemDown: '下移选择的已禁用Mod',
+
+
     errorMessage2I18N(s: string): string {
         if (s.includes('The quota has been exceeded.')) {
             return 'Zip文件过大，无法存储';

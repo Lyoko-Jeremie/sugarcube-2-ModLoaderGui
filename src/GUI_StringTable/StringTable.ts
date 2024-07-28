@@ -48,6 +48,17 @@ const StringTableKeys = [
     'NoReadMeString',
 
     'InvalidFile',
+
+
+    // used for ModSubUiAngularJsService.ts
+
+    'MoveEnabledSelectedItemUp',
+    'MoveEnabledSelectedItemDown',
+    'EnableSelectedItem',
+    'DisableSelectedItem',
+    'MoveDisabledSelectedItemUp',
+    'MoveDisabledSelectedItemDown',
+
 ] as const;
 
 export type StringTableTypeStringPart = { [key in typeof StringTableKeys[number]]: string; };
