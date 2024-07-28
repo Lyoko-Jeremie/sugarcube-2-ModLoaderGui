@@ -273,7 +273,7 @@ export class Gui {
                             this.gui!.fields['AddMod_R'].value = `Error: ${StringTable.errorMessage2I18N(m)}`;
                             this.gui!.fields['AddMod_R'].reload();
                         }
-                        const l = await this.listSideLoadMod();
+                        const l = await this.listSideLoadModNameOnly();
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
@@ -286,7 +286,7 @@ export class Gui {
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
-                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = l.join('\n');
+                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = (await this.listSideLoadMod()).join('\n');
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -309,6 +309,20 @@ export class Gui {
                     options: l,
                     default: undefined,
                     cssClassName: 'd-inline',
+                    afterToNode: async (node: HTMLElement, wrapper: HTMLElement | null, settings: Field, id: string, configId: string) => {
+                        const l = await this.listSideLoadModNameOnly();
+                        // @ts-ignore
+                        const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
+                        const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
+                        if (MyConfig_field_RemoveMod_s) {
+                            const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
+                            // clean options
+                            select.options.length = 0;
+                            for (const T of l) {
+                                select.options.add(new Option(T, T));
+                            }
+                        }
+                    }
                 },
                 ['RemoveMod' + '_b']: {
                     label: StringTable.RemoveMod,
@@ -331,7 +345,7 @@ export class Gui {
                         await this.gModUtils.getModLoadController().removeModIndexDB(vv);
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
 
-                        const l = await this.listSideLoadMod();
+                        const l = await this.listSideLoadModNameOnly();
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
                             for (let a in select.options) {
@@ -343,7 +357,7 @@ export class Gui {
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
-                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = l.join('\n');
+                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = (await this.listSideLoadMod()).join('\n');
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -716,6 +730,10 @@ export class Gui {
             }
         }
         return modNameVersionList;
+    }
+
+    async listSideLoadModNameOnly() {
+        return await this.gModUtils.getModLoadController().listModIndexDB() || [];
     }
 
     getModListString() {
