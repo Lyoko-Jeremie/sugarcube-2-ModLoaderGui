@@ -41,6 +41,7 @@ export const StringTable_EN: StringTableType = {
     SectionReadMe: 'Mod ReadMe',
     SectionLoadLog: 'Mod Load Log',
     SectionDebug: 'Debug',
+    ModConfig: 'ModConfig',
 
     NoReadMeString: '<<No ReadMe>>',
 

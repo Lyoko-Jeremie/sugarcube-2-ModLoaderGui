@@ -14,6 +14,7 @@ import {DebugExport} from "./DebugExport";
 import {getStringTable, StringTableType} from './GUI_StringTable/StringTable';
 import {ModLoadSwitch} from "./ModLoadSwitch";
 import {KeyFilter} from "./KeyFilter";
+import {ModSubUiAngularJsService} from "./ModSubUiAngularJsService";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -70,6 +71,7 @@ export class Gui {
         this.isHttpMode = location.protocol.startsWith('http');
         this.debugExport = new DebugExport(gSC2DataManager, gModUtils, gLoadingProgress);
         this.modLoadSwitch = new ModLoadSwitch(gSC2DataManager, gModUtils);
+        this.modSubUiAngularJsService = new ModSubUiAngularJsService(gModUtils);
     }
 
     isHttpMode = true;
@@ -110,6 +112,7 @@ export class Gui {
         if (this.gui && this.gui.isOpen) {
             console.log('createGui() (this.gui && this.gui.isOpen)');
             this.gui.close()
+            this.modSubUiAngularJsService?.release();
         }
         console.log('title', StringTable.title + (this.gModUtils.version || ''));
         this.gui = new GM_config({
@@ -135,6 +138,7 @@ export class Gui {
                     click: () => {
                         if (this.gui && this.gui.isOpen) {
                             this.gui.close();
+                            this.modSubUiAngularJsService?.release();
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -503,6 +507,17 @@ export class Gui {
                     cssClassName: 'd-inline',
                     xgmExtendField: {bootstrap: {btnType: btnType}},
                 },
+                [this.rId()]: {
+                    section: GM_config.create(StringTable.ModConfig),
+                    type: 'br',
+                },
+                [this.rId()]: {
+                    type: 'div',
+                    afterToNode: (node: HTMLElement, wrapper: HTMLElement | null, settings: Field, id: string, configId: string) => {
+                        console.log('modSubUiAngularJsService', this.modSubUiAngularJsService?.Ref);
+                        this.modSubUiAngularJsService?.bootstrap(node);
+                    },
+                },
             },
             events: {
                 save: (values) => {
@@ -534,11 +549,13 @@ export class Gui {
                                 if (event.shiftKey) {
                                     if (this.gui && this.gui.isOpen) {
                                         this.gui.close();
+                                        this.modSubUiAngularJsService?.release();
                                     }
                                     return;
                                 }
                                 if (this.gui && this.gui.isOpen) {
                                     this.gui.close();
+                                    this.modSubUiAngularJsService?.release();
                                 } else {
                                     await this.createGui();
                                     this.gui && this.gui.open();
@@ -577,6 +594,7 @@ export class Gui {
         return n;
     }
 
+    modSubUiAngularJsService?: ModSubUiAngularJsService;
 
     initOk = false;
 
@@ -593,11 +611,13 @@ export class Gui {
                 if (event.shiftKey) {
                     if (this.gui && this.gui.isOpen) {
                         this.gui.close();
+                        this.modSubUiAngularJsService?.release();
                     }
                     return;
                 }
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
+                    this.modSubUiAngularJsService?.release();
                 } else {
                     this.gui && this.gui.close();
                     await this.createGui();
@@ -625,6 +645,7 @@ export class Gui {
             this.startBanner.addEventListener('click', async () => {
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
+                    this.modSubUiAngularJsService?.release();
                 } else {
                     this.gui && this.gui.close();
                     await this.createGui();

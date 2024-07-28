@@ -41,6 +41,7 @@ export const StringTable_CN: StringTableType = {
     SectionReadMe: 'Mod ReadMe',
     SectionLoadLog: 'Mod加载日志',
     SectionDebug: '故障诊断',
+    ModConfig: 'Mod Config',
 
     NoReadMeString: '<<没有ReadMe>>',
 

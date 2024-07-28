@@ -43,6 +43,8 @@ const StringTableKeys = [
     'SectionLoadLog',
     'SectionDebug',
 
+    'ModConfig',
+
     'NoReadMeString',
 
     'InvalidFile',
