@@ -67,6 +67,7 @@ export class Gui {
                         break;
                 }
             }
+            this.patchVersionString();
         });
         this.isHttpMode = location.protocol.startsWith('http');
         this.debugExport = new DebugExport(gSC2DataManager, gModUtils, gLoadingProgress);
@@ -828,9 +829,25 @@ export class Gui {
     }
 
     patchVersionString() {
+        // console.log('patchVersionString()');
         // StartConfig.version = `${StartConfig.version}-(ML${('-v' + this.gModUtils.version || '')})`;
         // @ts-ignore
-        StartConfig.versionName = `${StartConfig.versionName}-(ML${('-v' + this.gModUtils.version || '')})`;
+        // StartConfig.versionName = `${StartConfig.versionName}-(ML${('-v' + this.gModUtils.version || '')})`;
+
+        const gameVersionDisplayNode = document.getElementById('gameVersionDisplay');
+        if (gameVersionDisplayNode) {
+            gameVersionDisplayNode.innerHTML = `${gameVersionDisplayNode.innerHTML}-(ML${('-v' + this.gModUtils.version || '')})`;
+            gameVersionDisplayNode.onclick = async (ev: MouseEvent) => {
+                console.log(ev);
+                if (this.gui && this.gui.isOpen) {
+                    this.gui.close();
+                    this.modSubUiAngularJsService?.release();
+                } else {
+                    await this.createGui();
+                    this.gui && this.gui.open();
+                }
+            };
+        }
     }
 
 }
