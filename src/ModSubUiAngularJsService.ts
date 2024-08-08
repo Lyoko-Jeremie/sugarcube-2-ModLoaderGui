@@ -17,6 +17,7 @@ export class ModSubUiAngularJsService {
     }
 
     get Ref() {
+        return undefined;
         return this.modSubUiAngularJs;
     }
 
