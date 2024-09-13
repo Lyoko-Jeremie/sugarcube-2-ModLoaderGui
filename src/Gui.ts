@@ -828,25 +828,46 @@ export class Gui {
         return JSON.stringify(mod.bootJson, undefined, 2);
     }
 
+    patchHtmlNodeVersionString(gameVersionDisplayNode: HTMLElement | Element | undefined | null) {
+        if (!gameVersionDisplayNode) {
+            return;
+        }
+        gameVersionDisplayNode.innerHTML = `${gameVersionDisplayNode.innerHTML}-(ML${('-v' + this.gModUtils.version || '')})`;
+        const clickCb = async (ev: MouseEvent | any) => {
+            console.log(ev);
+            if (this.gui && this.gui.isOpen) {
+                this.gui.close();
+                this.modSubUiAngularJsService?.release();
+            } else {
+                await this.createGui();
+                this.gui && this.gui.open();
+            }
+        };
+        if ('onclick' in gameVersionDisplayNode) {
+            gameVersionDisplayNode.onclick = clickCb;
+        } else if ('addEventListener' in gameVersionDisplayNode) {
+            gameVersionDisplayNode.addEventListener('click', async (ev) => {
+                await clickCb(ev);
+            });
+        } else {
+            console.warn('patchHtmlNodeVersionString() (!gameVersionDisplayNode) cannot attach clickCb.');
+        }
+    }
+
     patchVersionString() {
         // console.log('patchVersionString()');
         // StartConfig.version = `${StartConfig.version}-(ML${('-v' + this.gModUtils.version || '')})`;
         // @ts-ignore
         // StartConfig.versionName = `${StartConfig.versionName}-(ML${('-v' + this.gModUtils.version || '')})`;
 
-        const gameVersionDisplayNode = document.getElementById('gameVersionDisplay');
-        if (gameVersionDisplayNode) {
-            gameVersionDisplayNode.innerHTML = `${gameVersionDisplayNode.innerHTML}-(ML${('-v' + this.gModUtils.version || '')})`;
-            gameVersionDisplayNode.onclick = async (ev: MouseEvent) => {
-                console.log(ev);
-                if (this.gui && this.gui.isOpen) {
-                    this.gui.close();
-                    this.modSubUiAngularJsService?.release();
-                } else {
-                    await this.createGui();
-                    this.gui && this.gui.open();
-                }
-            };
+        const gameVersionDisplayNodeList = [
+            // for DoL
+            document.getElementById('gameVersionDisplay'),
+            // for Cot
+            document.querySelector('div#title-container span.version'),
+        ];
+        for (const n of gameVersionDisplayNodeList) {
+            this.patchHtmlNodeVersionString(n);
         }
     }
 
