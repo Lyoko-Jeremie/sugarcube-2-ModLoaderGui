@@ -498,7 +498,7 @@ export class Gui {
                     click: async () => {
                         this.debugExport.createDownload(
                             await this.debugExport.exportData(),
-                            `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
+                            this.debugExport.calcExportName(),
                         )
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -511,7 +511,7 @@ export class Gui {
                     click: async () => {
                         this.debugExport.createDownload(
                             await this.debugExport.exportData(true),
-                            `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
+                            this.debugExport.calcExportName(),
                         )
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -641,7 +641,7 @@ export class Gui {
             if (KeyFilter.exportData(event)) {
                 this.debugExport.createDownload(
                     await this.debugExport.exportData(),
-                    `DoLModExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`
+                    this.debugExport.calcExportName(),
                 )
             }
         });

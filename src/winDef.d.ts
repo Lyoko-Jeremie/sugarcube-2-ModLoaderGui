@@ -15,4 +15,13 @@ declare global {
     }
 
     var StartConfig: any;
+    var SugarCube: {
+        Macro: {
+            get: (name: string) => any;
+        };
+        Story: {
+            title: string;
+        };
+    };
+
 }

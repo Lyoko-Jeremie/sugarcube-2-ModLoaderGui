@@ -5,6 +5,7 @@ import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {LoadingProgress} from "./LoadingProgress";
 import JSZip from 'jszip';
+import moment from "moment/moment";
 
 export class DebugExport {
 
@@ -142,6 +143,14 @@ export class DebugExport {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         }, 1000);
+    }
+
+    calcExportName() {
+        const gameTitle = SugarCube.Story.title;
+        if (gameTitle) {
+            return `${gameTitle.replace(' ', '-')}_ExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`;
+        }
+        return `ModLoaderExportData_${moment().format('YYYYMMDD_HHmmss')}.zip`;
     }
 
 }
