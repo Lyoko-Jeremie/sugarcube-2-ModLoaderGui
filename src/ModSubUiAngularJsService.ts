@@ -139,6 +139,7 @@ export class ModSubUiAngularJsService {
                     DisableSelectedItem: StringTable.DisableSelectedItem,
                     MoveDisabledSelectedItemUp: StringTable.MoveDisabledSelectedItemUp,
                     MoveDisabledSelectedItemDown: StringTable.MoveDisabledSelectedItemDown,
+                    title: 'enable-order-component',
                 }
             },
         });
