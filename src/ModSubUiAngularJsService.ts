@@ -64,6 +64,9 @@ export class ModSubUiAngularJsService {
         }
         this.showListAdded = true;
 
+        // this.Ref.addComponent({
+        //     selector: 'show-component-list',
+        // });
         this.Ref.addComponentModGuiConfig({
             selector: 'enable-order-component',
             data: {
