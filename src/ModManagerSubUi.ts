@@ -47,7 +47,7 @@ export class ModManagerSubUi {
                         selected: false,
                     };
                 }),
-                onChange: (
+                onChange: async (
                     action: any,
                     listEnabled: {
                         key: string | number,
@@ -62,7 +62,9 @@ export class ModManagerSubUi {
                     selectedKeyEnabled: string | number,
                     selectedKeyDisabled: string | number,
                 ) => {
-                    console.log('onChange', [action, listEnabled, listDisabled, selectedKeyEnabled, selectedKeyDisabled]);
+                    // console.log('onChange', [action, listEnabled, listDisabled, selectedKeyEnabled, selectedKeyDisabled]);
+                    await this.modLoaderGui.gModUtils.getModLoadController().overwriteModIndexDBModList(listEnabled.map(T => T.key) as string[]);
+                    await this.modLoaderGui.gModUtils.getModLoadController().overwriteModIndexDBHiddenModList(listDisabled.map(T => T.key) as string[]);
                 },
                 noHrSplit: true,
                 buttonClass: 'btn btn-sm btn-secondary',
