@@ -58,6 +58,7 @@ const StringTableKeys = [
     'DisableSelectedItem',
     'MoveDisabledSelectedItemUp',
     'MoveDisabledSelectedItemDown',
+    'ModEnableGuiTitle',
 
 ] as const;
 

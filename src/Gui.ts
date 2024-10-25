@@ -15,6 +15,7 @@ import {getStringTable, StringTableType} from './GUI_StringTable/StringTable';
 import {ModLoadSwitch} from "./ModLoadSwitch";
 import {KeyFilter} from "./KeyFilter";
 import {ModSubUiAngularJsService} from "./ModSubUiAngularJsService";
+import {ModManagerSubUi} from "./ModManagerSubUi";
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -73,6 +74,7 @@ export class Gui {
         this.debugExport = new DebugExport(gSC2DataManager, gModUtils, gLoadingProgress);
         this.modLoadSwitch = new ModLoadSwitch(gSC2DataManager, gModUtils);
         this.modSubUiAngularJsService = new ModSubUiAngularJsService(gModUtils);
+        this.modManagerSubUi = new ModManagerSubUi(this.modSubUiAngularJsService, this);
         const nn = this.gModUtils.getNowRunningModName();
         if (nn) {
             this.nowModName = nn;
@@ -619,6 +621,7 @@ export class Gui {
     }
 
     protected modSubUiAngularJsService: ModSubUiAngularJsService;
+    protected modManagerSubUi: ModManagerSubUi;
 
     protected initOk = false;
 
@@ -748,6 +751,10 @@ export class Gui {
 
     async listSideLoadModNameOnly() {
         return await this.gModUtils.getModLoadController().listModIndexDB() || [];
+    }
+
+    async listSideLoadHiddenModNameOnly() {
+        return await this.gModUtils.getModLoadController().loadHiddenModList() || [];
     }
 
     getModListString() {

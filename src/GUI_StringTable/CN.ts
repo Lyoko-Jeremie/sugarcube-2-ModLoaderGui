@@ -55,6 +55,7 @@ export const StringTable_CN: StringTableType = {
     DisableSelectedItem: '禁用选中的Mod',
     MoveDisabledSelectedItemUp: '上移选中的已禁用Mod',
     MoveDisabledSelectedItemDown: '下移选中的已禁用Mod',
+    ModEnableGuiTitle: 'Mod启用及排序管理',
 
 
     errorMessage2I18N(s: string): string {
