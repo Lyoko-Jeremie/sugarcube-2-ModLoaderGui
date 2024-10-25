@@ -1,5 +1,11 @@
 import {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import {getStringTable, StringTableType} from "./GUI_StringTable/StringTable";
+import type {
+    ExternalComponentManagerInterface
+} from '../../ModSubUiAngularJs/dist-ts/AngularJs/ExternalComponentManagerInterface';
+import type {
+    ModSubUiAngularJsModeExportInterface
+} from '../../ModSubUiAngularJs/dist-ts/ModSubUiAngularJsModeExportInterface';
 
 // const StringTable = getStringTable();
 const StringTable: StringTableType = new Proxy({}, {
@@ -11,16 +17,15 @@ const StringTable: StringTableType = new Proxy({}, {
 
 export class ModSubUiAngularJsService {
 
-    get modSubUiAngularJs() {
+    get modSubUiAngularJs(): ModSubUiAngularJsModeExportInterface | undefined {
         // console.log('get modSubUiAngularJs', this.modUtils.getMod('ModSubUiAngularJs'));
-        return this.modUtils.getMod('ModSubUiAngularJs')?.modRef
+        return this.modUtils.getMod('ModSubUiAngularJs')?.modRef as any
     }
 
     get Ref() {
         return undefined;
         return this.modSubUiAngularJs;
     }
-
 
     constructor(
         public modUtils: ModUtils,

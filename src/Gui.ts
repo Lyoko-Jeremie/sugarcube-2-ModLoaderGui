@@ -427,6 +427,17 @@ export class Gui {
                     readonly: "readonly",
                 },
                 [this.rId()]: {
+                    section: GM_config.create(StringTable.ModConfig),
+                    type: 'br',
+                },
+                [this.rId()]: {
+                    type: 'div',
+                    afterToNode: (node: HTMLElement, wrapper: HTMLElement | null, settings: Field, id: string, configId: string) => {
+                        console.log('modSubUiAngularJsService', this.modSubUiAngularJsService?.Ref);
+                        this.modSubUiAngularJsService?.bootstrap(node);
+                    },
+                },
+                [this.rId()]: {
                     section: GM_config.create(StringTable.SectionLoadLog),
                     type: 'br',
                 },
@@ -517,17 +528,6 @@ export class Gui {
                     // cssStyleText: 'display: inline-block;',
                     cssClassName: 'd-inline',
                     xgmExtendField: {bootstrap: {btnType: btnType}},
-                },
-                [this.rId()]: {
-                    section: GM_config.create(StringTable.ModConfig),
-                    type: 'br',
-                },
-                [this.rId()]: {
-                    type: 'div',
-                    afterToNode: (node: HTMLElement, wrapper: HTMLElement | null, settings: Field, id: string, configId: string) => {
-                        console.log('modSubUiAngularJsService', this.modSubUiAngularJsService?.Ref);
-                        this.modSubUiAngularJsService?.bootstrap(node);
-                    },
                 },
             },
             events: {
