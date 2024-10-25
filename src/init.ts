@@ -12,4 +12,5 @@ window.modLoaderGui = new Gui(
     window.modLoaderGui_PassageTracer,
     window,
 );
+window.modLoaderGui_ModSubUiAngularJsService = window.modLoaderGui.getModSubUiAngularJsService();
 

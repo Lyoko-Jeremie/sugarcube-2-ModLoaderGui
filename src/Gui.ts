@@ -41,11 +41,11 @@ export class Gui {
         return '' + (++Gui.rIdP) + Math.random();
     }
 
-    debugExport: DebugExport;
+    protected debugExport: DebugExport;
 
-    modLoadSwitch: ModLoadSwitch;
+    protected modLoadSwitch: ModLoadSwitch;
 
-    logger: LogWrapper;
+    protected logger: LogWrapper;
 
     constructor(
         public gSC2DataManager: SC2DataManager,
@@ -73,13 +73,22 @@ export class Gui {
         this.debugExport = new DebugExport(gSC2DataManager, gModUtils, gLoadingProgress);
         this.modLoadSwitch = new ModLoadSwitch(gSC2DataManager, gModUtils);
         this.modSubUiAngularJsService = new ModSubUiAngularJsService(gModUtils);
+        const nn = this.gModUtils.getNowRunningModName();
+        if (nn) {
+            this.nowModName = nn;
+            this.gModUtils.getMod(nn)!.modRef = this;
+        } else {
+            this.logger.error('[ModLoaderGui]: nowModName is undefined. error.');
+        }
     }
 
-    isHttpMode = true;
+    protected nowModName?: string;
 
-    rootNode?: HTMLDivElement;
+    protected isHttpMode = true;
 
-    gui?: GM_configStruct;
+    protected rootNode?: HTMLDivElement;
+
+    protected gui?: GM_configStruct;
 
     // public getStringTable() {
     //     return cloneDeep(StringTable);
@@ -89,7 +98,7 @@ export class Gui {
     //     StringTable = stringTable;
     // }
 
-    logShowConfig = {
+    protected logShowConfig = {
         noInfo: false, noWarning: false, noError: false,
     };
 
@@ -109,7 +118,7 @@ export class Gui {
         if (this.gui && this.gui.isOpen) {
             console.log('createGui() (this.gui && this.gui.isOpen)');
             this.gui.close()
-            this.modSubUiAngularJsService?.release();
+            this.modSubUiAngularJsService.release();
         }
         console.log('title', StringTable.title + (this.gModUtils.version || ''));
         this.gui = new GM_config({
@@ -135,7 +144,7 @@ export class Gui {
                     click: () => {
                         if (this.gui && this.gui.isOpen) {
                             this.gui.close();
-                            this.modSubUiAngularJsService?.release();
+                            this.modSubUiAngularJsService.release();
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -433,8 +442,8 @@ export class Gui {
                 [this.rId()]: {
                     type: 'div',
                     afterToNode: (node: HTMLElement, wrapper: HTMLElement | null, settings: Field, id: string, configId: string) => {
-                        console.log('modSubUiAngularJsService', this.modSubUiAngularJsService?.Ref);
-                        this.modSubUiAngularJsService?.bootstrap(node);
+                        console.log('modSubUiAngularJsService', this.modSubUiAngularJsService.Ref);
+                        this.modSubUiAngularJsService.bootstrap(node);
                     },
                 },
                 [this.rId()]: {
@@ -560,13 +569,13 @@ export class Gui {
                                 if (event.shiftKey) {
                                     if (this.gui && this.gui.isOpen) {
                                         this.gui.close();
-                                        this.modSubUiAngularJsService?.release();
+                                        this.modSubUiAngularJsService.release();
                                     }
                                     return;
                                 }
                                 if (this.gui && this.gui.isOpen) {
                                     this.gui.close();
-                                    this.modSubUiAngularJsService?.release();
+                                    this.modSubUiAngularJsService.release();
                                 } else {
                                     await this.createGui();
                                     this.gui && this.gui.open();
@@ -605,11 +614,15 @@ export class Gui {
         return n;
     }
 
-    modSubUiAngularJsService?: ModSubUiAngularJsService;
+    public getModSubUiAngularJsService() {
+        return this.modSubUiAngularJsService;
+    }
 
-    initOk = false;
+    protected modSubUiAngularJsService: ModSubUiAngularJsService;
 
-    init() {
+    protected initOk = false;
+
+    protected init() {
         if (this.initOk) {
             console.error('init() (this.initOk)');
             return;
@@ -622,13 +635,13 @@ export class Gui {
                 if (event.shiftKey) {
                     if (this.gui && this.gui.isOpen) {
                         this.gui.close();
-                        this.modSubUiAngularJsService?.release();
+                        this.modSubUiAngularJsService.release();
                     }
                     return;
                 }
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
-                    this.modSubUiAngularJsService?.release();
+                    this.modSubUiAngularJsService.release();
                 } else {
                     this.gui && this.gui.close();
                     await this.createGui();
@@ -656,7 +669,7 @@ export class Gui {
             this.startBanner.addEventListener('click', async () => {
                 if (this.gui && this.gui.isOpen) {
                     this.gui.close();
-                    this.modSubUiAngularJsService?.release();
+                    this.modSubUiAngularJsService.release();
                 } else {
                     this.gui && this.gui.close();
                     await this.createGui();
@@ -667,7 +680,7 @@ export class Gui {
         }
     }
 
-    startBanner?: HTMLDivElement;
+    protected startBanner?: HTMLDivElement;
 
     async loadAndAddMod(htmlFile: HTMLInputElement) {
         try {
@@ -837,7 +850,7 @@ export class Gui {
             console.log(ev);
             if (this.gui && this.gui.isOpen) {
                 this.gui.close();
-                this.modSubUiAngularJsService?.release();
+                this.modSubUiAngularJsService.release();
             } else {
                 await this.createGui();
                 this.gui && this.gui.open();
