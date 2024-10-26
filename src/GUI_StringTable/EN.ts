@@ -55,7 +55,7 @@ export const StringTable_EN: StringTableType = {
     DisableSelectedItem: 'Disable Selected Mod',
     MoveDisabledSelectedItemUp: 'Move Selected Disabled Mod Up',
     MoveDisabledSelectedItemDown: 'Move Selected Disabled Mod Down',
-    ModEnableGuiTitle: 'Mod Enable And Order Manager',
+    ModEnableGuiTitle: 'Mod Enable And Order Manager (reload to take effect)',
 
 
     errorMessage2I18N(s: string): string {
