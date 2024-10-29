@@ -1,4 +1,4 @@
-import {StringTableType} from "./StringTable";
+import {ModNikeName, StringTableType} from "./StringTable";
 
 export const StringTable_EN: StringTableType = {
     title: 'ModLoader Manager',
@@ -60,5 +60,18 @@ export const StringTable_EN: StringTableType = {
 
     errorMessage2I18N(s: string): string {
         return s;
+    },
+
+    calcModNikeName(nn: ModNikeName): string | undefined {
+        if (!nn) {
+            return undefined;
+        }
+        if (typeof nn === 'string') {
+            return nn;
+        }
+        if (nn.en) {
+            return nn.en;
+        }
+        return undefined;
     },
 };

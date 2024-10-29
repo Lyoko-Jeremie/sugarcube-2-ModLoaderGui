@@ -1,4 +1,4 @@
-import {StringTableType} from "./StringTable";
+import {ModNikeName, StringTableType} from "./StringTable";
 
 export const StringTable_CN: StringTableType = {
     title: 'Mod管理器',
@@ -76,5 +76,18 @@ export const StringTable_CN: StringTableType = {
             return s.replace(/bootJsonFile (.+) Invalid/, `bootJson文件 [$1] 无效`);
         }
         return s;
+    },
+
+    calcModNikeName(nn: ModNikeName): string | undefined {
+        if (!nn) {
+            return undefined;
+        }
+        if (typeof nn === 'string') {
+            return nn;
+        }
+        if (nn.cn) {
+            return nn.cn;
+        }
+        return undefined;
     },
 };

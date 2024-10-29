@@ -762,7 +762,11 @@ export class Gui {
             if (!mi || !mi.nikeName) {
                 return '';
             }
-            return mi.nikeName ? `<${mi.nikeName}> ` : '';
+            const s = StringTable.calcModNikeName(mi.nikeName);
+            if (!s) {
+                return '';
+            }
+            return mi.nikeName ? `<${s}> ` : '';
         };
 
         const l = this.gModUtils.getModListName();
@@ -801,7 +805,7 @@ export class Gui {
                 if (m) {
                     r.push(`[alias][${m.from}] ${T} [${m.name}] ${nikeName(mi)}{v:${m.mod.bootJson.version || '?'}}`);
                 } else {
-                    r.push(`[?] [${T}] ${mi?.nikeName}{v:?}`);
+                    r.push(`[?] [${T}] ${nikeName(mi)}{v:?}`);
                 }
                 f = true;
             } else if (rr.length === 1) {
@@ -813,7 +817,7 @@ export class Gui {
                 r.push(rr[rr.length - 1]);
             }
             if (!f) {
-                r.push(`[?] ${T} <${mi?.nikeName}>`);
+                r.push(`[?] ${T} <${nikeName(mi)}>`);
             }
         }
         return r;
