@@ -1,4 +1,4 @@
-import {GM_config, Field, InitOptionsNoCustom, GM_configStruct, BootstrapBtnType} from './GM_config_TS/gm_config';
+import {BootstrapBtnType, Field, GM_config, GM_configStruct} from './GM_config_TS/gm_config';
 import inlineGMCss from './GM.css?inlineText';
 import inlineBootstrap from 'bootstrap/dist/css/bootstrap.css?inlineText';
 
@@ -6,8 +6,7 @@ import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
 import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
 import type {LogWrapper} from '../../../dist-BeforeSC2/ModLoadController';
-import {isString, isSafeInteger, isNil, isArray, isEqual, cloneDeep} from "lodash";
-import moment from "moment";
+import {isArray, isNil, isString} from "lodash";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
 import {DebugExport} from "./DebugExport";
@@ -115,6 +114,7 @@ export class Gui {
             + this.getModListString().join('\n');
         const l = await this.listSideLoadMod();
         const NowSideLoadModeList: string = l.join('\n');
+        console.log('NowLoadedModeList this.getModListString()', this.getModListString());
         console.log('NowLoadedModeList', NowLoadedModeList);
         console.log('NowSideLoadModeList', NowSideLoadModeList);
         if (this.gui && this.gui.isOpen) {
@@ -758,7 +758,13 @@ export class Gui {
     }
 
     getModListString() {
-        // TODO re-calc mod load list use read list and loaded list
+        const nikeName = (mi: ReturnType<ModUtils['getMod']>) => {
+            if (!mi || !mi.nikeName) {
+                return '';
+            }
+            return mi.nikeName ? `<${mi.nikeName}> ` : '';
+        };
+
         const l = this.gModUtils.getModListName();
         const ll = this.gSC2DataManager.getModLoader().getLocalLoader();
         const rl = this.gSC2DataManager.getModLoader().getRemoteLoader();
@@ -771,26 +777,34 @@ export class Gui {
             const mi = this.gModUtils.getMod(T);
             const rr: string[] = [];
             if (ll && ll.modZipList.has(T)) {
-                rr.push(`[Local] ${T} {v:${ll.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[Local] ${T} ${nikeName(mi)}{v:${ll.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (rl && rl.modZipList.has(T)) {
-                rr.push(`[Remote] ${T} {v:${rl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[Remote] ${T} ${nikeName(mi)}{v:${rl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (idl && idl.modZipList.has(T)) {
-                rr.push(`[SideLoad IndexDB] ${T} {v:${idl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[SideLoad IndexDB] ${T} ${nikeName(mi)}{v:${idl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (lsl && lsl.modZipList.has(T)) {
-                rr.push(`[SideLoad LocalStorage] ${T} {v:${lsl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[SideLoad LocalStorage] ${T} ${nikeName(mi)}{v:${lsl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (lal && lal.modZipList.has(T)) {
-                rr.push(`[SideLoadLazy] ${T} {v:${lal.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[SideLoadLazy] ${T} ${nikeName(mi)}{v:${lal.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
-            if (rr.length === 1) {
+            if (rr.length === 0) {
+                const m = this.gModUtils.getModAndFromInfo(T);
+                if (m) {
+                    r.push(`[alias][${m.from}] ${T} [${m.name}] ${nikeName(mi)}{v:${m.mod.bootJson.version || '?'}}`);
+                } else {
+                    r.push(`[?] [${T}] ${mi?.nikeName}{v:?}`);
+                }
+                f = true;
+            } else if (rr.length === 1) {
                 r.push(...rr);
             } else {
                 for (let i = 0; i < rr.length - 1; i++) {
@@ -799,7 +813,7 @@ export class Gui {
                 r.push(rr[rr.length - 1]);
             }
             if (!f) {
-                r.push(`[?] ${T}`);
+                r.push(`[?] ${T} <${mi?.nikeName}>`);
             }
         }
         return r;
