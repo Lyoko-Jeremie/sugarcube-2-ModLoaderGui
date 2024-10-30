@@ -1,4 +1,4 @@
-import {ModNikeName, StringTableType} from "./StringTable";
+import {ModNickName, StringTableType} from "./StringTable";
 
 export const StringTable_CN: StringTableType = {
     title: 'Mod管理器',
@@ -78,7 +78,7 @@ export const StringTable_CN: StringTableType = {
         return s;
     },
 
-    calcModNikeName(nn: ModNikeName): string | undefined {
+    calcModNickName(nn: ModNickName): string | undefined {
         if (!nn) {
             return undefined;
         }

@@ -64,12 +64,12 @@ const StringTableKeys = [
 
 export type StringTableTypeStringPart = { [key in typeof StringTableKeys[number]]: string; };
 
-export type ModNikeName = ({ [key in string]?: string } & { cn?: string, en?: string }) | string | undefined;
+export type ModNickName = ({ [key in string]?: string } & { cn?: string, en?: string }) | string | undefined;
 
 export interface StringTableType extends StringTableTypeStringPart {
     errorMessage2I18N(s: string): string;
 
-    calcModNikeName(mi: ModNikeName): string | undefined;
+    calcModNickName(mi: ModNickName): string | undefined;
 }
 
 export function getStringTable(): StringTableType {

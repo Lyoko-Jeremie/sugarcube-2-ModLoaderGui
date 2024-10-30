@@ -758,15 +758,15 @@ export class Gui {
     }
 
     getModListString() {
-        const nikeName = (mi: ReturnType<ModUtils['getMod']>) => {
-            if (!mi || !mi.nikeName) {
+        const nickName = (mi: ReturnType<ModUtils['getMod']>) => {
+            if (!mi || !mi.nickName) {
                 return '';
             }
-            const s = StringTable.calcModNikeName(mi.nikeName);
+            const s = StringTable.calcModNickName(mi.nickName);
             if (!s) {
                 return '';
             }
-            return mi.nikeName ? `<${s}> ` : '';
+            return mi.nickName ? `<${s}> ` : '';
         };
 
         const l = this.gModUtils.getModListName();
@@ -781,31 +781,31 @@ export class Gui {
             const mi = this.gModUtils.getMod(T);
             const rr: string[] = [];
             if (ll && ll.modZipList.has(T)) {
-                rr.push(`[Local] ${T} ${nikeName(mi)}{v:${ll.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[Local] ${T} ${nickName(mi)}{v:${ll.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (rl && rl.modZipList.has(T)) {
-                rr.push(`[Remote] ${T} ${nikeName(mi)}{v:${rl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[Remote] ${T} ${nickName(mi)}{v:${rl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (idl && idl.modZipList.has(T)) {
-                rr.push(`[SideLoad IndexDB] ${T} ${nikeName(mi)}{v:${idl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[SideLoad IndexDB] ${T} ${nickName(mi)}{v:${idl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (lsl && lsl.modZipList.has(T)) {
-                rr.push(`[SideLoad LocalStorage] ${T} ${nikeName(mi)}{v:${lsl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[SideLoad LocalStorage] ${T} ${nickName(mi)}{v:${lsl.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (lal && lal.modZipList.has(T)) {
-                rr.push(`[SideLoadLazy] ${T} ${nikeName(mi)}{v:${lal.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
+                rr.push(`[SideLoadLazy] ${T} ${nickName(mi)}{v:${lal.modZipList.get(T)?.[0].modInfo?.version || '?'}}`);
                 f = true;
             }
             if (rr.length === 0) {
                 const m = this.gModUtils.getModAndFromInfo(T);
                 if (m) {
-                    r.push(`[alias][${m.from}] ${T} [${m.name}] ${nikeName(mi)}{v:${m.mod.bootJson.version || '?'}}`);
+                    r.push(`[alias][${m.from}] ${T} [${m.name}] ${nickName(mi)}{v:${m.mod.bootJson.version || '?'}}`);
                 } else {
-                    r.push(`[?] [${T}] ${nikeName(mi)}{v:?}`);
+                    r.push(`[?] [${T}] ${nickName(mi)}{v:?}`);
                 }
                 f = true;
             } else if (rr.length === 1) {
@@ -817,7 +817,7 @@ export class Gui {
                 r.push(rr[rr.length - 1]);
             }
             if (!f) {
-                r.push(`[?] ${T} <${nikeName(mi)}>`);
+                r.push(`[?] ${T} <${nickName(mi)}>`);
             }
         }
         return r;
