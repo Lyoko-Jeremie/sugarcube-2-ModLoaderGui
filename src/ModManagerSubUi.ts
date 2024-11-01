@@ -62,9 +62,13 @@ export class ModManagerSubUi {
                     selectedKeyEnabled: string | number,
                     selectedKeyDisabled: string | number,
                 ) => {
-                    // console.log('onChange', [action, listEnabled, listDisabled, selectedKeyEnabled, selectedKeyDisabled]);
-                    await this.modLoaderGui.gModUtils.getModLoadController().overwriteModIndexDBModList(listEnabled.map(T => T.key) as string[]);
-                    await this.modLoaderGui.gModUtils.getModLoadController().overwriteModIndexDBHiddenModList(listDisabled.map(T => T.key) as string[]);
+                    try {
+                        // console.log('onChange', [action, listEnabled, listDisabled, selectedKeyEnabled, selectedKeyDisabled]);
+                        await this.modLoaderGui.gModUtils.getModLoadController().overwriteModIndexDBModList(listEnabled.map(T => T.key) as string[]);
+                        await this.modLoaderGui.gModUtils.getModLoadController().overwriteModIndexDBHiddenModList(listDisabled.map(T => T.key) as string[]);
+                    } catch (e) {
+                        console.error('[ModLoaderGui] ModManagerSubUi onChange', e);
+                    }
                 },
                 noHrSplit: true,
                 buttonClass: 'btn btn-sm btn-secondary',
