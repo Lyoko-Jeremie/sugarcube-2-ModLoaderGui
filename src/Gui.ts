@@ -4,8 +4,9 @@ import inlineBootstrap from 'bootstrap/dist/css/bootstrap.css?inlineText';
 
 import type {SC2DataManager} from "../../../dist-BeforeSC2/SC2DataManager";
 import type {ModUtils} from "../../../dist-BeforeSC2/Utils";
-import type {ModBootJson} from "../../../dist-BeforeSC2/ModLoader";
+import type {ModBootJson, ModInfo} from "../../../dist-BeforeSC2/ModLoader";
 import type {LogWrapper} from '../../../dist-BeforeSC2/ModLoadController';
+import type {ModLoadFromSourceType} from '../../../dist-BeforeSC2/ModOrderContainer';
 import {isArray, isNil, isString} from "lodash";
 import {LoadingProgress} from "./LoadingProgress";
 import {PassageTracer} from "./PassageTracer";
@@ -31,6 +32,17 @@ const divModCss = `
     padding: 1em;
 }
 `;
+
+const nickName = (mi: ModInfo | undefined) => {
+    if (!mi || !mi.nickName) {
+        return '';
+    }
+    const s = StringTable.calcModNickName(mi.nickName);
+    if (!s) {
+        return '';
+    }
+    return mi.nickName ? `<${s}> ` : '';
+};
 
 export class Gui {
     // avoid same Math.random
@@ -112,7 +124,7 @@ export class Gui {
         }
         const NowLoadedModeList = `ModLoader ${`{v:${this.gModUtils.version}}` || ''}\n`
             + this.getModListString().join('\n');
-        const l = await this.listSideLoadMod();
+        const l = await this.listSideLoadMod2();
         const NowSideLoadModeList: string = l.join('\n');
         console.log('NowLoadedModeList this.getModListString()', this.getModListString());
         console.log('NowLoadedModeList', NowLoadedModeList);
@@ -285,7 +297,7 @@ export class Gui {
                             this.gui!.fields['AddMod_R'].value = `Error: ${StringTable.errorMessage2I18N(m)}`;
                             this.gui!.fields['AddMod_R'].reload();
                         }
-                        const l = await this.listSideLoadModNameOnly();
+                        const l = await this.listSideLoadModInfo();
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
@@ -293,12 +305,12 @@ export class Gui {
                                 select.options.remove(0);
                             }
                             for (const T of l) {
-                                select.options.add(new Option(T, T));
+                                select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
-                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = (await this.listSideLoadMod()).join('\n');
+                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = (await this.listSideLoadMod2()).join('\n');
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -322,7 +334,7 @@ export class Gui {
                     default: undefined,
                     cssClassName: 'd-inline',
                     afterToNode: async (node: HTMLElement, wrapper: HTMLElement | null, settings: Field, id: string, configId: string) => {
-                        const l = await this.listSideLoadModNameOnly();
+                        const l = this.listSideLoadModInfo();
                         // @ts-ignore
                         const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
@@ -331,7 +343,8 @@ export class Gui {
                             // clean options
                             select.options.length = 0;
                             for (const T of l) {
-                                select.options.add(new Option(T, T));
+                                console.log('T', T);
+                                select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
                             }
                         }
                     }
@@ -357,19 +370,20 @@ export class Gui {
                         await this.gModUtils.getModLoadController().removeModIndexDB(vv);
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
 
-                        const l = await this.listSideLoadModNameOnly();
+                        const l = this.listSideLoadModInfo();
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
                             for (let a in select.options) {
                                 select.options.remove(0);
                             }
                             for (const T of l) {
-                                select.options.add(new Option(T, T));
+                                console.log('T', T);
+                                select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
                         if (MyConfig_field_NowSideLoadModeList_r) {
-                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = (await this.listSideLoadMod()).join('\n');
+                            (MyConfig_field_NowSideLoadModeList_r as HTMLTextAreaElement).value = (await this.listSideLoadMod2()).join('\n');
                         }
                     },
                     // cssStyleText: 'display: inline-block;',
@@ -406,7 +420,10 @@ export class Gui {
                             ]);
                             return;
                         }
-                        const readMe = await this.getModTReadMe(vv);
+                        const readMe = await this.getModTReadMe(vv).catch(E => {
+                            console.error('getModTReadMe', E);
+                            return '<Cannot Load>'
+                        });
                         const bootJson = await this.getModTJson(vv);
                         // console.log('readMe', readMe);
 
@@ -571,13 +588,13 @@ export class Gui {
                                 if (event.shiftKey) {
                                     if (this.gui && this.gui.isOpen) {
                                         this.gui.close();
-                                        this.modSubUiAngularJsService.release();
+                                        await this.modSubUiAngularJsService.release();
                                     }
                                     return;
                                 }
                                 if (this.gui && this.gui.isOpen) {
                                     this.gui.close();
-                                    this.modSubUiAngularJsService.release();
+                                    await this.modSubUiAngularJsService.release();
                                 } else {
                                     await this.createGui();
                                     this.gui && this.gui.open();
@@ -732,25 +749,49 @@ export class Gui {
         }
     }
 
-    async listSideLoadMod() {
+    async listSideLoadMod2() {
         const nameList = await this.gModUtils.getModLoadController().listModIndexDB() || [];
-        const idl = this.gSC2DataManager.getModLoader().getIndexDBLoader();
+        const modList = this.gModUtils.getAllModInfoByFromType('IndexDB' as ModLoadFromSourceType);
+        const idl = new Map<string, typeof modList[0]>(modList.map(T => [T.name, T]));
         const modNameVersionList = [];
-        if (idl) {
-            for (const T of nameList) {
-                const mod = idl.modZipList.get(T);
-                if (mod) {
-                    modNameVersionList.push(`${T} {v:${mod[0].modInfo?.version || '?'}}`);
-                } else {
-                    modNameVersionList.push(`${T} {v:?}`);
-                }
+        for (const T of nameList) {
+            const modInfo = idl.get(T);
+            if (modInfo) {
+                modNameVersionList.push(`${T} {v:${modInfo.mod.version || '?'}}${nickName(modInfo.mod)}`);
+            } else {
+                modNameVersionList.push(`${T} {v:?}`);
             }
         }
         return modNameVersionList;
     }
 
+    // async listSideLoadMod() {
+    //     const nameList = await this.gModUtils.getModLoadController().listModIndexDB() || [];
+    //     const idl = this.gSC2DataManager.getModLoader().getIndexDBLoader();
+    //     const modNameVersionList = [];
+    //     if (idl) {
+    //         for (const T of nameList) {
+    //             const mod = idl.modZipList.get(T);
+    //             if (mod) {
+    //                 modNameVersionList.push(`${T} {v:${mod[0].modInfo?.version || '?'}}`);
+    //             } else {
+    //                 modNameVersionList.push(`${T} {v:?}`);
+    //             }
+    //         }
+    //     }
+    //     return modNameVersionList;
+    // }
+
     async listSideLoadModNameOnly() {
         return await this.gModUtils.getModLoadController().listModIndexDB() || [];
+    }
+
+    listSideLoadModInfo(): { name: string, mod: ModInfo, from: ModLoadFromSourceType }[] {
+        return [
+            // ...this.gModUtils.getAllModInfoByFromType('LocalStorage' as ModLoadFromSourceType),
+            ...this.gModUtils.getAllModInfoByFromType('IndexDB' as ModLoadFromSourceType),
+            // ...this.gModUtils.getAllModInfoByFromType('SideLazy' as ModLoadFromSourceType),
+        ];
     }
 
     async listSideLoadHiddenModNameOnly() {
@@ -758,17 +799,6 @@ export class Gui {
     }
 
     getModListString() {
-        const nickName = (mi: ReturnType<ModUtils['getMod']>) => {
-            if (!mi || !mi.nickName) {
-                return '';
-            }
-            const s = StringTable.calcModNickName(mi.nickName);
-            if (!s) {
-                return '';
-            }
-            return mi.nickName ? `<${s}> ` : '';
-        };
-
         const l = this.gModUtils.getModListName();
         const ll = this.gSC2DataManager.getModLoader().getLocalLoader();
         const rl = this.gSC2DataManager.getModLoader().getRemoteLoader();
