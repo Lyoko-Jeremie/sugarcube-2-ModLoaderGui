@@ -126,6 +126,7 @@ export class Gui {
             + this.getModListString().join('\n');
         const l = await this.listSideLoadMod2();
         const NowSideLoadModeList: string = l.join('\n');
+        const removeAbleModList = (await this.listSideLoadModInfo()).map(T => T.name);
         console.log('NowLoadedModeList this.getModListString()', this.getModListString());
         console.log('NowLoadedModeList', NowLoadedModeList);
         console.log('NowSideLoadModeList', NowSideLoadModeList);
@@ -305,7 +306,8 @@ export class Gui {
                                 select.options.remove(0);
                             }
                             for (const T of l) {
-                                select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
+                                // select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
+                                select.options.add(new Option(T.name, T.name));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
@@ -330,23 +332,33 @@ export class Gui {
                     label: StringTable.CanRemoveModList,
                     type: 'select',
                     labelPos: 'left',
-                    options: l,
+                    options: removeAbleModList,
                     default: undefined,
                     cssClassName: 'd-inline',
                     afterToNode: async (node: HTMLElement, wrapper: HTMLElement | null, settings: Field, id: string, configId: string) => {
-                        const l = this.listSideLoadModInfo();
-                        // @ts-ignore
-                        const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
-                        const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
-                        if (MyConfig_field_RemoveMod_s) {
-                            const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
-                            // clean options
-                            select.options.length = 0;
-                            for (const T of l) {
-                                console.log('T', T);
-                                select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
-                            }
-                        }
+                        // const l = await this.listSideLoadModInfo();
+                        // // @ts-ignore
+                        // const doc = this.gui!.frame?.contentDocument || this.gui!.frame;
+                        // if (!doc) {
+                        //     console.error('RemoveMod_s (!doc) : ', this.gui!.frame);
+                        //     return;
+                        // }
+                        // const RemoveMod_s_node = this.gui!.fields['RemoveMod_s'];
+                        // RemoveMod_s_node.settings.options = (await this.listSideLoadModInfo()).map(T => T.name);
+                        // console.log('RemoveMod afterToNode RemoveMod_s_node', RemoveMod_s_node);
+                        // RemoveMod_s_node.reload();
+
+                        // const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
+                        // // console.log('RemoveMod afterToNode MyConfig_field_RemoveMod_s', MyConfig_field_RemoveMod_s);
+                        // if (MyConfig_field_RemoveMod_s) {
+                        //     const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
+                        //     // clean options
+                        //     select.options.length = 0;
+                        //     for (const T of l) {
+                        //         console.log('RemoveMod afterToNode T', T);
+                        //         select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
+                        //     }
+                        // }
                     }
                 },
                 ['RemoveMod' + '_b']: {
@@ -370,7 +382,7 @@ export class Gui {
                         await this.gModUtils.getModLoadController().removeModIndexDB(vv);
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
 
-                        const l = this.listSideLoadModInfo();
+                        const l = await this.listSideLoadModInfo();
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
                             for (let a in select.options) {
@@ -378,7 +390,8 @@ export class Gui {
                             }
                             for (const T of l) {
                                 console.log('T', T);
-                                select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
+                                // select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
+                                select.options.add(new Option(T.name, T.name));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
@@ -786,12 +799,15 @@ export class Gui {
         return await this.gModUtils.getModLoadController().listModIndexDB() || [];
     }
 
-    listSideLoadModInfo(): { name: string, mod: ModInfo, from: ModLoadFromSourceType }[] {
-        return [
+    async listSideLoadModInfo(): Promise<{ name: string, mod: ModInfo, from: ModLoadFromSourceType }[]> {
+        const mList = [
             // ...this.gModUtils.getAllModInfoByFromType('LocalStorage' as ModLoadFromSourceType),
             ...this.gModUtils.getAllModInfoByFromType('IndexDB' as ModLoadFromSourceType),
             // ...this.gModUtils.getAllModInfoByFromType('SideLazy' as ModLoadFromSourceType),
         ];
+        const nameList = await this.gModUtils.getModLoadController().listModIndexDB() || [];
+        const nameSet = new Set(nameList);
+        return mList.filter(T => nameSet.has(T.name));
     }
 
     async listSideLoadHiddenModNameOnly() {
