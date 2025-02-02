@@ -126,7 +126,8 @@ export class Gui {
             + this.getModListString().join('\n');
         const l = await this.listSideLoadMod2();
         const NowSideLoadModeList: string = l.join('\n');
-        const removeAbleModList = (await this.listSideLoadModInfo()).map(T => T.name);
+        // const removeAbleModList = (await this.listSideLoadModInfo()).map(T => T.name);
+        const removeAbleModList = await this.listSideLoadModNameCanUnload();
         console.log('NowLoadedModeList this.getModListString()', this.getModListString());
         console.log('NowLoadedModeList', NowLoadedModeList);
         console.log('NowSideLoadModeList', NowSideLoadModeList);
@@ -298,7 +299,7 @@ export class Gui {
                             this.gui!.fields['AddMod_R'].value = `Error: ${StringTable.errorMessage2I18N(m)}`;
                             this.gui!.fields['AddMod_R'].reload();
                         }
-                        const l = await this.listSideLoadModInfo();
+                        const l = await this.listSideLoadModNameCanUnload();
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
@@ -307,7 +308,8 @@ export class Gui {
                             }
                             for (const T of l) {
                                 // select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
-                                select.options.add(new Option(T.name, T.name));
+                                // select.options.add(new Option(T.name, T.name));
+                                select.options.add(new Option(T, T));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
@@ -382,7 +384,7 @@ export class Gui {
                         await this.gModUtils.getModLoadController().removeModIndexDB(vv);
                         const MyConfig_field_RemoveMod_s = doc.querySelector('#MyConfig_field_RemoveMod_s');
 
-                        const l = await this.listSideLoadModInfo();
+                        const l = await this.listSideLoadModNameCanUnload();
                         if (MyConfig_field_RemoveMod_s) {
                             const select = (MyConfig_field_RemoveMod_s as HTMLSelectElement);
                             for (let a in select.options) {
@@ -391,7 +393,8 @@ export class Gui {
                             for (const T of l) {
                                 console.log('T', T);
                                 // select.options.add(new Option(`${T.name}${nickName(T.mod)}`, T.name));
-                                select.options.add(new Option(T.name, T.name));
+                                // select.options.add(new Option(T.name, T.name));
+                                select.options.add(new Option(T, T));
                             }
                         }
                         const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
@@ -799,16 +802,27 @@ export class Gui {
         return await this.gModUtils.getModLoadController().listModIndexDB() || [];
     }
 
-    async listSideLoadModInfo(): Promise<{ name: string, mod: ModInfo, from: ModLoadFromSourceType }[]> {
-        const mList = [
-            // ...this.gModUtils.getAllModInfoByFromType('LocalStorage' as ModLoadFromSourceType),
-            ...this.gModUtils.getAllModInfoByFromType('IndexDB' as ModLoadFromSourceType),
-            // ...this.gModUtils.getAllModInfoByFromType('SideLazy' as ModLoadFromSourceType),
+    async listSideLoadModNameCanUnload() {
+        const nameList = [
+            ...await this.gModUtils.getModLoadController().listModIndexDB(),
+            ...await this.gModUtils.getModLoadController().loadHiddenModList(),
         ];
-        const nameList = await this.gModUtils.getModLoadController().listModIndexDB() || [];
-        const nameSet = new Set(nameList);
-        return mList.filter(T => nameSet.has(T.name));
+        return nameList;
     }
+
+    // async listSideLoadModInfo(): Promise<{ name: string, mod: ModInfo, from: ModLoadFromSourceType }[]> {
+    //     const mList = [
+    //         // ...this.gModUtils.getAllModInfoByFromType('LocalStorage' as ModLoadFromSourceType),
+    //         ...this.gModUtils.getAllModInfoByFromType('IndexDB' as ModLoadFromSourceType),
+    //         // ...this.gModUtils.getAllModInfoByFromType('SideLazy' as ModLoadFromSourceType),
+    //     ];
+    //     const nameList = [
+    //         ...await this.gModUtils.getModLoadController().listModIndexDB(),
+    //         ...await this.gModUtils.getModLoadController().loadHiddenModList(),
+    //     ];
+    //     const nameSet = new Set(nameList);
+    //     return mList.filter(T => nameSet.has(T.name));
+    // }
 
     async listSideLoadHiddenModNameOnly() {
         return await this.gModUtils.getModLoadController().loadHiddenModList() || [];
