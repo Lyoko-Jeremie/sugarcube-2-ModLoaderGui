@@ -66,7 +66,7 @@ export class DebugExport {
         for (const item of sc.passageDataItems.items) {
             // console.log('passage', [item.name, item.content]);
             const data = `:: ${item.name}`
-                + `${item.tags.length === 0 ? '' : (' [' + item.tags[0] + ']')}`
+                + `${item.tags.length === 0 ? '' : (' [' + item.tags.join(' ') + ']')}`
                 + `\n${item.content}`;
             // console.log('passage', [item.name, item.tags, data,]);
             if (!passageDir) {
