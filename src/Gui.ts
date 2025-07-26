@@ -16,6 +16,7 @@ import {ModLoadSwitch} from "./ModLoadSwitch";
 import {KeyFilter} from "./KeyFilter";
 import {ModSubUiAngularJsService} from "./ModSubUiAngularJsService";
 import {ModManagerSubUi} from "./ModManagerSubUi";
+import uint8ToBase64 from 'uint8-to-base64';
 
 const btnType: BootstrapBtnType = 'secondary';
 
@@ -727,32 +728,31 @@ export class Gui {
                 return Promise.reject(`Error: ${StringTable.InvalidFile}`);
             }
             const file = f[0];
-            const data = await new Promise((resolve, reject) => {
+            const data: ArrayBuffer = await new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
+                reader.readAsArrayBuffer(file);
                 reader.onload = function (e) {
-                    resolve(e.target?.result);
+                    resolve(e.target?.result as ArrayBuffer);
                 };
                 reader.onerror = function (e) {
                     reject(e);
                 }
             });
-            console.log('data', data);
-            if (data && isString(data) && /^data:[^:;]+;base64,/.test(data)) {
-                const base64 = data.replace(/^data:[^:;]+;base64,/, '');
-                const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFileIndexDB(base64);
-                if (isString(zipFile)) {
-                    return Promise.reject(`Error: ${zipFile}`);
-                } else {
+            // console.log('data', data);
+            const u8Data = new Uint8Array(data);
+            const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFileIndexDB(u8Data);
+            if (isString(zipFile)) {
+                return Promise.reject(`Error: ${zipFile}`);
+            } else {
+                try {
+                    await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, u8Data);
+                } catch (e) {
+                    console.error(e);
                     try {
-                        await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, base64);
+                        const base64 = uint8ToBase64.encode(u8Data);
+                        this.gModUtils.getModLoadController().addModLocalStorage(zipFile.name, base64);
                     } catch (e) {
                         console.error(e);
-                        try {
-                            this.gModUtils.getModLoadController().addModLocalStorage(zipFile.name, base64);
-                        } catch (e) {
-                            console.error(e);
-                        }
                     }
                 }
             }
