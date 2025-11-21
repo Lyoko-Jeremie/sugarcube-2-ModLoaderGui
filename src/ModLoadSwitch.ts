@@ -90,6 +90,7 @@ class SafeMode implements Sc2EventTracerCallback, LifeTimeCircleHook {
     }
 
     modWhiteList = [
+        'ConflictChecker',
         'ModSubUiAngularJs',
     ];
 }
