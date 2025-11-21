@@ -80,10 +80,18 @@ class SafeMode implements Sc2EventTracerCallback, LifeTimeCircleHook {
         console.log('ModLoadSwitch.canLoadThisMod()', [bootJson.name]);
         if (this.isSafeModeOn()) {
             console.log('ModLoadSwitch.canLoadThisMod() safeMode is on');
+            if (this.modWhiteList.includes(bootJson.name)) {
+                console.log('ModLoadSwitch.canLoadThisMod() mod is in white list, allow load', bootJson.name);
+                return true;
+            }
             return false;
         }
         return true;
     }
+
+    modWhiteList = [
+        'ModSubUiAngularJs',
+    ];
 }
 
 export class ModLoadSwitch implements LifeTimeCircleHook {

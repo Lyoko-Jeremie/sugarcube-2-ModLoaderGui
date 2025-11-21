@@ -1,6 +1,6 @@
 {
   "name": "ModLoaderGui",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "styleFileList": [
   ],
   "scriptFileList_earlyload": [
@@ -26,7 +26,7 @@
   "dependenceInfo": [
     {
       "modName": "ModLoader",
-      "version": "^2.60.0"
+      "version": "^2.100.0"
     }
   ]
 }
