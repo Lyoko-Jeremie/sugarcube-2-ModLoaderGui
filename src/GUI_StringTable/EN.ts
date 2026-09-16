@@ -14,7 +14,7 @@ export const StringTable_EN: StringTableType = {
 
     NowLoadedModeList: 'NowLoadedModeList：',
     NowSideLoadModeList: 'NowSideLoadModeList：（Usable After Next Page Load If Enabled）',
-    SelectModZipFile: 'SelectModZipFile：',
+    SelectModZipFile: 'Select Mod Zip files (multiple selection supported):',
     AddMod: 'AddMod',
     AddModResult: 'AddModResult：',
     CanRemoveModList: 'CanRemoveModList：',
