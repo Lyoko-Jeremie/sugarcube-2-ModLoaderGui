@@ -262,6 +262,11 @@ export class Gui {
                     label: StringTable.SelectModZipFile,
                     type: 'file',
                     cssClassName: 'd-inline',
+                    afterToNode: (node) => {
+                        const input = node as HTMLInputElement;
+                        input.multiple = true;
+                        input.accept = '.zip';
+                    },
                 },
                 'AddMod_b': {
                     label: StringTable.AddMod,
@@ -284,8 +289,7 @@ export class Gui {
                         }
                         try {
                             const R = await this.loadAndAddMod((vv as any));
-                            // this.gui!.fields['AddMod_R'].value = `Success. reload page to take effect`;
-                            this.gui!.fields['AddMod_R'].value = `Success. 刷新页面后生效`;
+                            this.gui!.fields['AddMod_R'].value = R;
                             this.gui!.fields['AddMod_R'].reload();
                             // console.log('this.gModUtils.getModLoadController().listModLocalStorage()', this.gModUtils.getModLoadController().listModLocalStorage());
                             // const MyConfig_field_NowSideLoadModeList_r = doc.querySelector('#MyConfig_field_NowSideLoadModeList_r');
@@ -720,49 +724,65 @@ export class Gui {
     protected startBanner?: HTMLDivElement;
 
     async loadAndAddMod(htmlFile: HTMLInputElement) {
-        try {
-            const f = htmlFile.files;
-            console.log('f', f);
-            if (!(f && f.length === 1)) {
-                console.error('loadAndAddMod() (!(f && f.length === 1))');
-                return Promise.reject(`Error: ${StringTable.InvalidFile}`);
-            }
-            const file = f[0];
-            const data: ArrayBuffer = await new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsArrayBuffer(file);
-                reader.onload = function (e) {
-                    resolve(e.target?.result as ArrayBuffer);
-                };
-                reader.onerror = function (e) {
-                    reject(e);
-                }
-            });
-            // console.log('data', data);
-            const u8Data = new Uint8Array(data);
-            const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFileIndexDB(u8Data);
-            if (isString(zipFile)) {
-                return Promise.reject(`Error: ${zipFile}`);
-            } else {
-                try {
-                    await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, u8Data);
-                } catch (e) {
-                    console.error(e);
-                    try {
-                        const base64 = uint8ToBase64.encode(u8Data);
-                        this.gModUtils.getModLoadController().addModLocalStorage(zipFile.name, base64);
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            }
-            return `Success. reload page to take effect`;
-        } catch (E: any) {
-            console.error('loadAndAddMod', E);
-            const m = E?.message || E?.toString() || E;
-            // return `Error: ${m}}`
-            return Promise.reject(E);
+        const files = Array.from(htmlFile.files || []);
+        console.log('files', files);
+        if (files.length === 0) {
+            console.error('loadAndAddMod() files.length === 0');
+            return Promise.reject(StringTable.InvalidFile);
         }
+
+        const success: string[] = [];
+        const failures: string[] = [];
+
+        // Add files sequentially because IndexDBLoader.addMod() reads and rewrites
+        // the complete mod list for every file. Parallel writes could lose entries.
+        for (const file of files) {
+            try {
+                const modName = await this.loadAndAddModFile(file);
+                success.push(modName);
+            } catch (E: any) {
+                console.error('loadAndAddMod', file.name, E);
+                const message = E?.message || E?.toString() || E;
+                failures.push(`${file.name}: ${StringTable.errorMessage2I18N(message)}`);
+            }
+        }
+
+        if (success.length === 0) {
+            return Promise.reject(failures.join('; '));
+        }
+
+        const result = [`Success: ${success.length}/${files.length}. 刷新页面后生效`];
+        if (failures.length > 0) {
+            result.push(`Failed: ${failures.join('; ')}`);
+        }
+        return result.join(' | ');
+    }
+
+    async loadAndAddModFile(file: File) {
+        const data: ArrayBuffer = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = function (e) {
+                resolve(e.target?.result as ArrayBuffer);
+            };
+            reader.onerror = function (e) {
+                reject(e);
+            };
+        });
+        const u8Data = new Uint8Array(data);
+        const zipFile: ModBootJson | string = await this.gModUtils.getModLoadController().checkModZipFileIndexDB(u8Data);
+        if (isString(zipFile)) {
+            return Promise.reject(zipFile);
+        }
+
+        try {
+            await this.gModUtils.getModLoadController().addModIndexDB(zipFile.name, u8Data);
+        } catch (e) {
+            console.error(e);
+            const base64 = uint8ToBase64.encode(u8Data);
+            await this.gModUtils.getModLoadController().addModLocalStorage(zipFile.name, base64);
+        }
+        return zipFile.name;
     }
 
     async listSideLoadMod2() {
@@ -970,4 +990,3 @@ export class Gui {
     }
 
 }
-
