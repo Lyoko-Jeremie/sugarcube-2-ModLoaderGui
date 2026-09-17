@@ -14,7 +14,7 @@ export const StringTable_CN: StringTableType = {
 
     NowLoadedModeList: '当前已加载的Mod列表：',
     NowSideLoadModeList: '当前设定的旁加载Mod列表：（启用后在下次刷新页面后生效）',
-    SelectModZipFile: '选择要添加的旁加载Mod的Zip文件：',
+    SelectModZipFile: '选择要添加的旁加载Mod的Zip文件（可多选）：',
     AddMod: '添加旁加载Mod',
     AddModResult: '添加旁加载Mod的结果：',
     CanRemoveModList: '可移除的旁加载Mod列表：',
